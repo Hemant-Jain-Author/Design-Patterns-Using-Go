@@ -1,51 +1,69 @@
-import unittest
+package main
 
-class Rectangle():
-    def __init__(self, l, w):
-        self.height = l
-        self.width = w
+import "fmt"
 
-    def set_width(self, w):
-        self.width = w
+type Rectangle struct {
+	height int
+	width  int
+}
 
-    def set_height(self, h):
-        self.height = h
+func NewRectangle(l, w int) *Rectangle {
+	return &Rectangle{height: l, width: w}
+}
 
-    def get_width(self):
-        return self.width
+func (r *Rectangle) SetWidth(w int) {
+	r.width = w
+}
 
-    def get_height(self):
-        return self.height
+func (r *Rectangle) SetHeight(h int) {
+	r.height = h
+}
 
-class Square(Rectangle):
-    def __init__(self, l):
-        self.height = l
-        self.width = l
+func (r *Rectangle) GetWidth() int {
+	return r.width
+}
 
-    def set_width(self, w):
-        self.width = self.height = w
+func (r *Rectangle) GetHeight() int {
+	return r.height
+}
 
-    def set_height(self, h):
-        self.width = self.height = h
+type Square struct {
+	*Rectangle
+}
 
-def testRect(rect):
-    rect.set_height(10)
-    rect.set_width(20)
-    if 10*20 == rect.get_height()*rect.get_width():
-        print("Pass")
-    else:
-        print("Failed")
+func NewSquare(l int) *Square {
+	return &Square{Rectangle: NewRectangle(l, l)}
+}
 
+func (s *Square) SetWidth(w int) {
+	s.width = w
+	s.height = w
+}
 
-# Client code.
-r = Rectangle(10, 20)
-testRect(r)
+func (s *Square) SetHeight(h int) {
+	s.width = h
+	s.height = h
+}
 
-s = Square(10)
-s.set_width(20)
-testRect(s)
+func TestRect(rect *Rectangle) {
+	if 10*20 == rect.GetHeight()*rect.GetWidth() {
+		fmt.Println("Pass")
+	} else {
+		fmt.Println("Failed")
+	}
+}
 
-"""
+func main() {
+	r := NewRectangle(10, 10)
+    r.SetWidth(20)
+	TestRect(r)
+
+	s := NewSquare(10)
+	s.SetWidth(20)
+	TestRect(s.Rectangle)
+}
+
+/*
 Pass
 Failed
-"""
+*/

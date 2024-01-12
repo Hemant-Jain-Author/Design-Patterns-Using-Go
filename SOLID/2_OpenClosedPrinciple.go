@@ -1,55 +1,82 @@
-class Animal:
-    def __init__(self, name):
-        self.name = name
+package main
 
-class Bird(Animal):
-	def fly(self):
-		pass
+import "fmt"
 
-class Dodo(Bird):
-	def fly(self):
-		print("The dodo is extinct and cannot fly.")
+type Animal struct {
+	name string
+}
 
-class Penguin(Bird):
-	def fly(self):
-		print("The penguin cannot fly.")
+type Bird struct {
+	Animal
+}
 
-	def slide(self):
-		print("The penguin is sliding on its belly!")
+func (b *Bird) fly() {
+	// To be overridden by subclasses
+}
 
-	def swim(self):
-		print("The penguin is swimming in the water!")
+type Dodo struct {
+	Bird
+}
 
-class Eagle(Bird):
-	def fly(self):
-		print("The eagle is soaring through the sky!")
+func (d *Dodo) fly() {
+	fmt.Println("The dodo is extinct and cannot fly.")
+}
 
-class Sparrow(Bird):
-	def fly(self):
-		print("The sparrow is fluttering its wings!")
+type Penguin struct {
+	Bird
+}
 
-# Client code.
-bird1 = Eagle("Eagle")
-bird1.fly()
+func (p *Penguin) fly() {
+	fmt.Println("The penguin cannot fly.")
+}
 
-bird2 = Dodo("Dodo")
-bird2.fly()
+func (p *Penguin) slide() {
+	fmt.Println("The penguin is sliding on its belly!")
+}
 
-"""
+func (p *Penguin) swim() {
+	fmt.Println("The penguin is swimming in the water!")
+}
+
+type Eagle struct {
+	Bird
+}
+
+func (e *Eagle) fly() {
+	fmt.Println("The eagle is soaring through the sky!")
+}
+
+type Sparrow struct {
+	Bird
+}
+
+func (s *Sparrow) fly() {
+	fmt.Println("The sparrow is fluttering its wings!")
+}
+
+// Client code.
+func main() {
+	bird1 := &Eagle{Bird{Animal{"Eagle"}}}
+	bird1.fly()
+
+	bird2 := &Dodo{Bird{Animal{"Dodo"}}}
+	bird2.fly()
+
+	/*
+		The eagle is soaring through the sky!
+		The dodo is extinct and cannot fly.
+	*/
+
+	bird3 := &Penguin{Bird{Animal{"Pigeon"}}}
+	bird3.fly()
+
+	/*
+		The pigeon is fluttering its wings!
+	*/
+}
+
+/*
 The eagle is soaring through the sky!
 The dodo is extinct and cannot fly.
-"""
-
-class Pigeon(Bird):
-	def make_cooing_sound(self):
-		print("The pigeon is making a cooing sound.")
-	
-	def fly(self):
-		print("The pigeon is fluttering its wings!")
-
-bird3 = Pigeon("Pigeon")
-bird3.fly()
-
-"""
-The pigeon is fluttering its wings!
-"""
+The penguin cannot fly.
+*/

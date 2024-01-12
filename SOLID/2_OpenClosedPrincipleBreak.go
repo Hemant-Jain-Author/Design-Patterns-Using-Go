@@ -1,26 +1,38 @@
-class Animal:
-    def __init__(self, name):
-        self.name = name
+package main
 
-class Bird(Animal):
-    def fly(self):
-        if self.name == "Dodo":
-            print("The dodo is extinct and cannot fly.")
-        elif self.name == "Penguin":
-            print("The penguin cannot fly.")
-        elif self.name == "Eagle":
-            print("The eagle is soaring through the sky!")
-        elif self.name == "Sparrow":
-            print("The sparrow is fluttering its wings!")
+import "fmt"
 
-# Client code.
-bird1 = Bird("Eagle")
-bird1.fly()
+type Animal struct {
+	name string
+}
 
-bird2 = Bird("Dodo")
-bird2.fly()
+type Bird struct {
+	Animal
+}
 
-"""
+func (b *Bird) fly() {
+	switch b.name {
+	case "Dodo":
+		fmt.Println("The dodo is extinct and cannot fly.")
+	case "Penguin":
+		fmt.Println("The penguin cannot fly.")
+	case "Eagle":
+		fmt.Println("The eagle is soaring through the sky!")
+	case "Sparrow":
+		fmt.Println("The sparrow is fluttering its wings!")
+	}
+}
+
+// Client code.
+func main() {
+	bird1 := &Bird{Animal{"Eagle"}}
+	bird1.fly()
+
+	bird2 := &Bird{Animal{"Dodo"}}
+	bird2.fly()
+}
+
+/*
 The eagle is soaring through the sky!
 The dodo is extinct and cannot fly.
-"""
+*/

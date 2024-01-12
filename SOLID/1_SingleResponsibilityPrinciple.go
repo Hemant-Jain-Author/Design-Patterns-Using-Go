@@ -1,49 +1,71 @@
-class Animal:
-	def __init__(self, name):
-		self.name = name
+package main
 
-	def eat(self):
-		print(f"{self.name} is eating.")
+import "fmt"
 
-	def sleep(self):
-		print(f"{self.name} is sleeping.")
+type Animal struct {
+    name string
+}
 
-	def make_sound(self):
-		print(f"{self.name} is making a sound.")
+func (a *Animal) eat() {
+    fmt.Printf("%s is eating.\n", a.name)
+}
 
-class Mammal(Animal):
-	def give_birth(self):
-		print(f"{self.name} is giving birth to live young.")
+func (a *Animal) sleep() {
+    fmt.Printf("%s is sleeping.\n", a.name)
+}
 
-class Reptile(Animal):
-	def lay_eggs(self):
-		print(f"{self.name} is laying eggs.")
+func (a *Animal) makeSound() {
+    fmt.Printf("%s is making a sound.\n", a.name)
+}
 
-class Bird(Animal):
-	def fly(self):
-		print(f"{self.name} is flying.")
+type Mammal struct {
+    Animal
+}
 
-	def lay_eggs(self):
-		print(f"{self.name} is laying eggs.")
+func (m *Mammal) giveBirth() {
+    fmt.Printf("%s is giving birth to live young.\n", m.name)
+}
 
-# Client code.
-animal1 = Mammal("Cat")
-animal1.give_birth()
-animal1.make_sound()
+type Reptile struct {
+    Animal
+}
 
-animal2 = Reptile("Snake")
-animal2.lay_eggs()
-animal2.eat()
+func (r *Reptile) layEggs() {
+    fmt.Printf("%s is laying eggs.\n", r.name)
+}
 
-animal3 = Bird("Eagle")
-animal3.fly()
-animal3.lay_eggs()
+type Bird struct {
+    Animal
+}
 
-"""
+func (b *Bird) fly() {
+    fmt.Printf("%s is flying.\n", b.name)
+}
+
+func (b *Bird) layEggs() {
+    fmt.Printf("%s is laying eggs.\n", b.name)
+}
+
+func main() {
+    animal1 := Mammal{Animal{"Cat"}}
+    animal1.giveBirth()
+    animal1.makeSound()
+
+    animal2 := Reptile{Animal{"Snake"}}
+    animal2.layEggs()
+    animal2.eat()
+
+    animal3 := Bird{Animal{"Eagle"}}
+    animal3.fly()
+    animal3.layEggs()
+}
+
+
+/*
 Cat is giving birth to live young.
 Cat is making a sound.
 Snake is laying eggs.
 Snake is eating.
 Eagle is flying.
 Eagle is laying eggs.
-"""
+*/

@@ -1,56 +1,88 @@
-from abc import ABC, abstractmethod
+package main
 
-class Animal(ABC):
-    def __init__(self, name):
-        self.name = name
+import "fmt"
 
-class Bird(Animal):
-    def __init__(self, name):
-        super().__init__(name)
-        self.flight_height = 0
+type Animal interface {
+}
 
-    def fly(self):
-        pass
+type Bird struct {
+    Animal
+    name         string
+    flightHeight int
+}
 
-class Sparrow(Bird):
-    def fly(self):
-        print("The sparrow is fluttering its wings.")
-        self.flight_height = 100
+func NewBird(name string) *Bird {
+    return &Bird{name: name, flightHeight: 0}
+}
 
-class Penguin(Bird):
-    def fly(self):
-        print("The penguin cannot fly.")
+type Sparrow struct {
+    *Bird
+}
 
-    def slide(self):
-        print("The penguin is sliding on its belly!")
+func NewSparrow(name string) *Sparrow {
+    return &Sparrow{Bird: NewBird(name)}
+}
 
-    def swim(self):
-        print("The penguin is swimming in the water!")
+func (s *Sparrow) Fly() {
+    fmt.Println("The sparrow is fluttering its wings.")
+    s.flightHeight = 100
+}
 
-class Dodo(Bird):
-    def fly(self):
-        print("The dodo is extinct and cannot fly.")
+type Penguin struct {
+    *Bird
+}
 
-def test(bird):
-    bird.fly()
-    if bird.flight_height > 0:
-        print("Bird is flying at a positive height.")
-    else:
-        print("Error: fly() method called; flight height is still zero.")
+func NewPenguin(name string) *Penguin {
+    return &Penguin{Bird: NewBird(name)}
+}
 
-# Client code.
-sparrow = Sparrow("Sparrow")
-test(sparrow)
+func (p *Penguin) Fly() {
+    fmt.Println("The penguin cannot fly.")
+}
 
-penguin = Penguin("Penguin")
-test(penguin)
-penguin.slide()
-penguin.swim()
+func (p *Penguin) Slide() {
+    fmt.Println("The penguin is sliding on its belly!")
+}
 
-dodo = Dodo("Dodo")
-test(dodo)
+func (p *Penguin) Swim() {
+    fmt.Println("The penguin is swimming in the water!")
+}
 
-"""
+type Dodo struct {
+    *Bird
+}
+
+func NewDodo(name string) *Dodo {
+    return &Dodo{Bird: NewBird(name)}
+}
+
+func (d *Dodo) Fly() {
+    fmt.Println("The dodo is extinct and cannot fly.")
+}
+
+func Test(bird *Bird) {
+    if bird.flightHeight > 0 {
+        fmt.Println("Bird is flying at a positive height.")
+    } else {
+        fmt.Println("Error: Fly() method called; flight height is still zero.")
+    }
+}
+
+func main() {
+    sparrow := NewSparrow("Sparrow")
+    sparrow.Fly()
+    Test(sparrow.Bird)
+
+    penguin := NewPenguin("Penguin")
+    penguin.Fly()
+    Test(penguin.Bird)
+
+    dodo := NewDodo("Dodo")
+    dodo.Fly()
+    Test(dodo.Bird)
+}
+
+/*
 The sparrow is fluttering its wings.
 Bird is flying at a positive height.
 The penguin cannot fly.
@@ -59,4 +91,4 @@ The penguin is sliding on its belly!
 The penguin is swimming in the water!
 The dodo is extinct and cannot fly.
 Error: fly() method called; flight height is still zero.
-"""
+*/

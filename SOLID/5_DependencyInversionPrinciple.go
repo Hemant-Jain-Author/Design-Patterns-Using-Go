@@ -1,37 +1,48 @@
-from abc import ABC, abstractmethod
+package main
 
-class IMailSender(ABC):
-    @abstractmethod
-    def send_mail(self, to_address, from_address, subject, body):
-        pass
+import "fmt"
 
-class SmtpServer(IMailSender):
-    def send_mail(self, to_address, from_address, subject, body):
-        print(f"Send mail: subject: {subject} from: {from_address} to: {to_address} body: {body}")
+// IMailSender interface
+type IMailSender interface {
+	SendMail(toAddress, fromAddress, subject, body string)
+}
 
-class EmailSender:
-    def __init__(self, mail_sender: IMailSender):
-        self.mail_sender = mail_sender
+// SmtpServer struct
+type SmtpServer struct{}
 
-    def send_email(self, to_address, from_address, subject, body):
-        # Delegate email sending to the mail sender implementation
-        self.mail_sender.send_mail(to_address, from_address, subject, body)
+// SendMail method for SmtpServer
+func (s SmtpServer) SendMail(toAddress, fromAddress, subject, body string) {
+	fmt.Printf("Send mail: subject: %s from: %s to: %s body: %s\n", subject, fromAddress, toAddress, body)
+}
 
-# Client code.
-# Create an instance of the SmtpServer class
-smtp_server = SmtpServer()
+// EmailSender struct
+type EmailSender struct {
+	MailSender IMailSender
+}
 
-# Create an instance of the EmailSender class and pass in the SmtpServer instance
-email_sender = EmailSender(smtp_server)
+// SendEmail method for EmailSender
+func (e EmailSender) SendEmail(toAddress, fromAddress, subject, body string) {
+	// Delegate email sending to the mail sender implementation
+	e.MailSender.SendMail(toAddress, fromAddress, subject, body)
+}
 
-# Send an email using the EmailSender instance
-email_sender.send_email(
-    to_address='recipient@example.com',
-    from_address='sender@example.com',
-    subject='mail subject.',
-    body='This is a test email body.'
-)
+func main() {
+	// Client code.
+	// Create an instance of the SmtpServer class
+	smtpServer := SmtpServer{}
 
-"""
+	// Create an instance of the EmailSender class and pass in the SmtpServer instance
+	emailSender := EmailSender{MailSender: smtpServer}
+
+	// Send an email using the EmailSender instance
+	emailSender.SendEmail(
+		"recipient@example.com",
+		"sender@example.com",
+		"mail subject.",
+		"This is a test email body.",
+	)
+}
+
+/*
 Send mail: subject: mail subject. from: sender@example.com to: recipient@example.com body: This is a test email body.
-"""
+*/

@@ -1,51 +1,69 @@
-from abc import ABC, abstractmethod
+package main
 
-class Printable(ABC):
-    @abstractmethod
-    def print(self, document):
-        pass
+import "fmt"
 
-class Scannable(ABC):
-    @abstractmethod
-    def scan(self):
-        pass
+// Printable interface
+type Printable interface {
+	Print(document string)
+}
 
-class Faxable(ABC):
-    @abstractmethod
-    def fax(self, document):
-        pass
+// Scannable interface
+type Scannable interface {
+	Scan()
+}
 
-class BasicInkjetPrinter(Printable, Scannable):
-    def print(self, document):
-        print(f"Printing {document} using basic inkjet printer")
+// Faxable interface
+type Faxable interface {
+	Fax(document string)
+}
 
-    def scan(self):
-        print("Scanning using basic inkjet printer")
+// BasicInkjetPrinter struct
+type BasicInkjetPrinter struct{}
 
-class HighEndOfficePrinter(Printable, Scannable, Faxable):
-    def print(self, document):
-        print(f"Printing {document} using high end office printer")
+// Print method for BasicInkjetPrinter
+func (bip BasicInkjetPrinter) Print(document string) {
+	fmt.Printf("Printing %s using basic inkjet printer\n", document)
+}
 
-    def scan(self):
-        print("Scanning using high end office printer")
+// Scan method for BasicInkjetPrinter
+func (bip BasicInkjetPrinter) Scan() {
+	fmt.Println("Scanning using basic inkjet printer")
+}
 
-    def fax(self, document):
-        print(f"Faxing {document} using high end office printer")
+// HighEndOfficePrinter struct
+type HighEndOfficePrinter struct{}
 
-# Client code
-basic_printer = BasicInkjetPrinter()
-basic_printer.print("Sample Document")
-basic_printer.scan()
+// Print method for HighEndOfficePrinter
+func (heop HighEndOfficePrinter) Print(document string) {
+	fmt.Printf("Printing %s using high end office printer\n", document)
+}
 
-office_printer = HighEndOfficePrinter()
-office_printer.print("Important Report")
-office_printer.scan()
-office_printer.fax("Confidential Memo")
+// Scan method for HighEndOfficePrinter
+func (heop HighEndOfficePrinter) Scan() {
+	fmt.Println("Scanning using high end office printer")
+}
 
-"""
+// Fax method for HighEndOfficePrinter
+func (heop HighEndOfficePrinter) Fax(document string) {
+	fmt.Printf("Faxing %s using high end office printer\n", document)
+}
+
+func main() {
+	// Client code
+	basicPrinter := BasicInkjetPrinter{}
+	basicPrinter.Print("Sample Document")
+	basicPrinter.Scan()
+
+	officePrinter := HighEndOfficePrinter{}
+	officePrinter.Print("Important Report")
+	officePrinter.Scan()
+	officePrinter.Fax("Confidential Memo")
+}
+
+/*
 Printing Sample Document using basic inkjet printer
 Scanning using basic inkjet printer
 Printing Important Report using high end office printer
 Scanning using high end office printer
 Faxing Confidential Memo using high end office printer
-"""
+*/
