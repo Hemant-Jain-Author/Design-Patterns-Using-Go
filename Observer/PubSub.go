@@ -1,78 +1,107 @@
-class Publisher(object):
-    def __init__(self):
-        self.topic_subscribers = {}
- 
-    def subscribe(self, subs, topic):
-        if topic in self.topic_subscribers:
-            self.topic_subscribers[topic].append(subs)    
-        else :
-            self.topic_subscribers[topic] = [subs]
+package main
 
-        print('Subscribing: %s to topic: %s ' % (subs.id, topic))
+import (
+	"fmt"
+)
 
+// Publisher interface
+type Publisher interface {
+	Subscribe(subs Subscriber, topic string)
+	Unsubscribe(subs Subscriber, topic string)
+	Notify(data string, topic string)
+}
 
-    def unsubscribe(self, subs, topic):
-        if topic in self.topic_subscribers:
-            self.topic_subscribers[topic].remove(subs)    
+// ConcretePublisher struct
+type ConcretePublisher struct {
+	topicSubscribers map[string][]Subscriber
+}
 
-        print('UnSubscribing: %s to topic: %s ' % (subs.id, topic))
+func (p *ConcretePublisher) Subscribe(subs Subscriber, topic string) {
+	if p.topicSubscribers == nil {
+		p.topicSubscribers = make(map[string][]Subscriber)
+	}
 
- 
-    def notify(self, data, topic):
-        if topic not in self.topic_subscribers:
-            return
- 
-        print('Publishing: %s in topic: %s ' %(data, topic))
-        for subscriber in self.topic_subscribers[topic]:
-            subscriber.update(data)
+	p.topicSubscribers[topic] = append(p.topicSubscribers[topic], subs)
+	fmt.Printf("Subscribing: %s to topic: %s\n", subs.GetID(), topic)
+}
 
+func (p *ConcretePublisher) Unsubscribe(subs Subscriber, topic string) {
+	if subscribers, ok := p.topicSubscribers[topic]; ok {
+		for i, s := range subscribers {
+			if s == subs {
+				p.topicSubscribers[topic] = append(subscribers[:i], subscribers[i+1:]...)
+				break
+			}
+		}
+	}
 
-class Subscriber(object):
-    def __init__(self, id):
-        self.id = id
- 
-    def update(self, data):
-        print('Subscriber %s got :: %s'%(self.id, data))
+	fmt.Printf("Unsubscribing: %s to topic: %s\n", subs.GetID(), topic)
+}
 
+func (p *ConcretePublisher) Notify(data string, topic string) {
+	if subscribers, ok := p.topicSubscribers[topic]; ok {
+		fmt.Printf("Publishing: %s in topic: %s\n", data, topic)
+		for _, subscriber := range subscribers {
+			subscriber.Update(data)
+		}
+	}
+}
 
-# Client code
-pub = Publisher()
- 
-sub1 = Subscriber('Subscriber1')
-sub2 = Subscriber('Subscriber2')
-sub3 = Subscriber('Subscriber3')
+// Subscriber interface
+type Subscriber interface {
+	Update(data string)
+	GetID() string
+}
 
-print()
-pub.subscribe(sub1, 'topic1')
-pub.subscribe(sub2, 'topic2')
-pub.subscribe(sub3, 'topic2')
+// ConcreteSubscriber struct
+type ConcreteSubscriber struct {
+	id string
+}
 
-print()
-pub.notify('Topic 1 data', 'topic1')
+func (s *ConcreteSubscriber) Update(data string) {
+	fmt.Printf("Subscriber %s got :: %s\n", s.id, data)
+}
 
-print()
-pub.notify('Topic 2 data', 'topic2')
+func (s *ConcreteSubscriber) GetID() string {
+	return s.id
+}
 
-print()
-pub.unsubscribe(sub3, 'topic2')
-pub.notify('Topic 2 data', 'topic2')
+func main() {
+	pub := &ConcretePublisher{}
 
-"""
-Subscribing: Subscriber1 to topic: topic1 
-Subscribing: Subscriber2 to topic: topic2 
-Subscribing: Subscriber3 to topic: topic2 
+	sub1 := &ConcreteSubscriber{id: "Subscriber1"}
+	sub2 := &ConcreteSubscriber{id: "Subscriber2"}
+	sub3 := &ConcreteSubscriber{id: "Subscriber3"}
 
-Publishing: Topic 1 data in topic: topic1 
+	fmt.Println()
+	pub.Subscribe(sub1, "topic1")
+	pub.Subscribe(sub2, "topic2")
+	pub.Subscribe(sub3, "topic2")
+
+	fmt.Println()
+	pub.Notify("Topic 1 data", "topic1")
+
+	fmt.Println()
+	pub.Notify("Topic 2 data", "topic2")
+
+	fmt.Println()
+	pub.Unsubscribe(sub3, "topic2")
+	pub.Notify("Topic 2 data", "topic2")
+}
+
+/*
+Subscribing: Subscriber1 to topic: topic1
+Subscribing: Subscriber2 to topic: topic2
+Subscribing: Subscriber3 to topic: topic2
+
+Publishing: Topic 1 data in topic: topic1
 Subscriber Subscriber1 got :: Topic 1 data
 
-Publishing: Topic 2 data in topic: topic2 
+Publishing: Topic 2 data in topic: topic2
 Subscriber Subscriber2 got :: Topic 2 data
 Subscriber Subscriber3 got :: Topic 2 data
 
-UnSubscribing: Subscriber3 to topic: topic2 
-Publishing: Topic 2 data in topic: topic2 
+Unsubscribing: Subscriber3 to topic: topic2
+Publishing: Topic 2 data in topic: topic2
 Subscriber Subscriber2 got :: Topic 2 data
-
-"""    
-
-
+*/

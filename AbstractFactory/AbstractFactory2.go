@@ -1,80 +1,90 @@
-from abc import ABC, abstractmethod
+package main
 
-# Abstract ProductA
-class ProductA(ABC):
-    @abstractmethod
-    def operationA(self):
-        pass
+import "fmt"
 
-# Concrete ProductA1
-class ProductA1(ProductA):
-    def operationA(self):
-        print("ProductA1 operationA")
+// ProductA interface
+type ProductA interface {
+	OperationA()
+}
 
-# Concrete ProductA2
-class ProductA2(ProductA):
-    def operationA(self):
-        print("ProductA2 operationA")
+// ProductA1 struct
+type ProductA1 struct{}
 
-# Abstract ProductB
-class ProductB(ABC):
-    @abstractmethod
-    def operationB(self):
-        pass
+func (p ProductA1) OperationA() {
+	fmt.Println("ProductA1 operationA")
+}
 
-# Concrete ProductB1
-class ProductB1(ProductB):
-    def operationB(self):
-        print("ProductB1 operationB")
+// ProductA2 struct
+type ProductA2 struct{}
 
-# Concrete ProductB2
-class ProductB2(ProductB):
-    def operationB(self):
-        print("ProductB2 operationB")
+func (p ProductA2) OperationA() {
+	fmt.Println("ProductA2 operationA")
+}
 
-# Abstract Factory
-class AbstractFactory(ABC):
-    @abstractmethod
-    def createProductA(self):
-        pass
-    
-    @abstractmethod
-    def createProductB(self):
-        pass
+// ProductB interface
+type ProductB interface {
+	OperationB()
+}
 
-# Concrete Factory1
-class ConcreteFactory1(AbstractFactory):
-    def createProductA(self):
-        return ProductA1()
-    
-    def createProductB(self):
-        return ProductB1()
+// ProductB1 struct
+type ProductB1 struct{}
 
-# Concrete Factory2
-class ConcreteFactory2(AbstractFactory):
-    def createProductA(self):
-        return ProductA2()
-    
-    def createProductB(self):
-        return ProductB2()
+func (p ProductB1) OperationB() {
+	fmt.Println("ProductB1 operationB")
+}
 
+// ProductB2 struct
+type ProductB2 struct{}
 
-# Client code
-factory1 = ConcreteFactory1()
-productA1 = factory1.createProductA()
-productB1 = factory1.createProductB()
-productA1.operationA()
-productB1.operationB()
+func (p ProductB2) OperationB() {
+	fmt.Println("ProductB2 operationB")
+}
 
-factory2 = ConcreteFactory2()
-productA2 = factory2.createProductA()
-productB2 = factory2.createProductB()
-productA2.operationA()
-productB2.operationB()
+// AbstractFactory interface
+type AbstractFactory interface {
+	CreateProductA() ProductA
+	CreateProductB() ProductB
+}
 
-"""
+// ConcreteFactory1 struct
+type ConcreteFactory1 struct{}
+
+func (f ConcreteFactory1) CreateProductA() ProductA {
+	return ProductA1{}
+}
+
+func (f ConcreteFactory1) CreateProductB() ProductB {
+	return ProductB1{}
+}
+
+// ConcreteFactory2 struct
+type ConcreteFactory2 struct{}
+
+func (f ConcreteFactory2) CreateProductA() ProductA {
+	return ProductA2{}
+}
+
+func (f ConcreteFactory2) CreateProductB() ProductB {
+	return ProductB2{}
+}
+
+func main() {
+	factory1 := ConcreteFactory1{}
+	productA1 := factory1.CreateProductA()
+	productB1 := factory1.CreateProductB()
+	productA1.OperationA()
+	productB1.OperationB()
+
+	factory2 := ConcreteFactory2{}
+	productA2 := factory2.CreateProductA()
+	productB2 := factory2.CreateProductB()
+	productA2.OperationA()
+	productB2.OperationB()
+}
+
+/*
 ProductA1 operationA
 ProductB1 operationB
 ProductA2 operationA
 ProductB2 operationB
-"""
+*/

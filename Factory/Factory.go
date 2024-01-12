@@ -1,45 +1,57 @@
-from abc import ABC, abstractmethod
+package main
 
-# Product interface
-class Animal(ABC):
-    @abstractmethod
-    def speak(self):
-        pass
+import "fmt"
 
-# Concrete Product classes
-class Dog(Animal):
-    def speak(self):
-        print("Woof!") 
+// Animal interface
+type Animal interface {
+	Speak()
+}
 
-class Cat(Animal):
-    def speak(self):
-        print("Meow!")
+// Concrete Product classes
+type Dog struct{}
 
-# Creator abstract class
-class AnimalFactory(ABC):
-    @abstractmethod
-    def create_animal(self):
-        pass
+func (d *Dog) Speak() {
+	fmt.Println("Woof!")
+}
 
-# Concrete Creator classes
-class DogFactory(AnimalFactory):
-    def create_animal(self):
-        return Dog()
+type Cat struct{}
 
-class CatFactory(AnimalFactory):
-    def create_animal(self):
-        return Cat()
+func (c *Cat) Speak() {
+	fmt.Println("Meow!")
+}
 
-# Client code
-dog_factory = DogFactory()
-dog = dog_factory.create_animal()
-dog.speak()
+// Creator abstract class
+type AnimalFactory interface {
+	CreateAnimal() Animal
+}
 
-cat_factory = CatFactory()
-cat = cat_factory.create_animal()
-cat.speak()
+// Concrete Creator classes
+type DogFactory struct{}
 
-"""
+func (df *DogFactory) CreateAnimal() Animal {
+	return &Dog{}
+}
+
+type CatFactory struct{}
+
+func (cf *CatFactory) CreateAnimal() Animal {
+	return &Cat{}
+}
+
+// Client code
+func main() {
+	// Dog
+	dogFactory := &DogFactory{}
+	dog := dogFactory.CreateAnimal()
+	dog.Speak()
+
+	// Cat
+	catFactory := &CatFactory{}
+	cat := catFactory.CreateAnimal()
+	cat.Speak()
+}
+
+/*
 Woof!
 Meow!
-"""
+*/

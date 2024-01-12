@@ -1,121 +1,128 @@
-from abc import ABC, abstractmethod
-import datetime
-import math
+package main
 
-class Context:
-    def __init__(self, state):
-        self.current_state = state
-        
-    def change_state(self, state):
-        self.current_state = state
-    
-    def request(self):
-        #print(self.current_state)
-        self.current_state.handle(self)
+import (
+	"fmt"
+	"time"
+)
 
+type Context struct {
+	currentState State
+}
 
-class State(object):
-    def handle(self, context):
-        pass
+func NewContext(state State) *Context {
+	return &Context{
+		currentState: state,
+	}
+}
 
+func (c *Context) changeState(state State) {
+	c.currentState = state
+}
 
-class ConcreteState1(State):
-    _instance = None  # Keep instance reference 
-    @staticmethod
-    def instance(): # Singleton pattern
-        if not ConcreteState1._instance:  
-            ConcreteState1._instance = ConcreteState1()
-        return ConcreteState1._instance
+func (c *Context) request() {
+	c.currentState.handle(c)
+}
 
+type State interface {
+	handle(context *Context)
+}
 
-    def handle(self, context):
-        context.change_state(ConcreteState2.instance())
+type ConcreteState1 struct {
+}
 
+var concreteState1Instance *ConcreteState1
 
-class ConcreteState2(State):
-    _instance = None  # Keep instance reference 
-    @staticmethod
-    def instance(): # Singleton pattern
-        if not ConcreteState2._instance:  
-            ConcreteState2._instance = ConcreteState2()
-        return ConcreteState2._instance
+func NewConcreteState1() *ConcreteState1 {
+	return &ConcreteState1{}
+}
 
+func (cs1 *ConcreteState1) handle(context *Context) {
+	context.changeState(ConcreteState2Instance())
+}
 
-    def handle(self, context):
-        context.change_state(ConcreteState3.instance())
+func ConcreteState1Instance() *ConcreteState1 {
+	if concreteState1Instance == nil {
+		concreteState1Instance = NewConcreteState1()
+	}
+	return concreteState1Instance
+}
 
+type ConcreteState2 struct {
+}
 
-class ConcreteState3(State):
-    _instance = None  # Keep instance reference 
-    @staticmethod
-    def instance(): # Singleton pattern
-        if not ConcreteState3._instance:  
-            ConcreteState3._instance = ConcreteState3()
-        return ConcreteState3._instance
+var concreteState2Instance *ConcreteState2
 
+func NewConcreteState2() *ConcreteState2 {
+	return &ConcreteState2{}
+}
 
-    def handle(self, context):
+func (cs2 *ConcreteState2) handle(context *Context) {
+	context.changeState(ConcreteState3Instance())
+}
 
-        context.change_state(ConcreteState4.instance())
+func ConcreteState2Instance() *ConcreteState2 {
+	if concreteState2Instance == nil {
+		concreteState2Instance = NewConcreteState2()
+	}
+	return concreteState2Instance
+}
 
+type ConcreteState3 struct {
+}
 
-class ConcreteState4(State):
-    _instance = None  # Keep instance reference 
-    @staticmethod
-    def instance(): # Singleton pattern
-        if not ConcreteState4._instance:  
-            ConcreteState4._instance = ConcreteState4()
-        return ConcreteState4._instance
+var concreteState3Instance *ConcreteState3
 
+func NewConcreteState3() *ConcreteState3 {
+	return &ConcreteState3{}
+}
 
-    def handle(self, context):
-        context.change_state(ConcreteState1.instance())
+func (cs3 *ConcreteState3) handle(context *Context) {
+	context.changeState(ConcreteState4Instance())
+}
 
-class St(ABC):
-    @abstractmethod
-    def handle(self, context):
-        pass
+func ConcreteState3Instance() *ConcreteState3 {
+	if concreteState3Instance == nil {
+		concreteState3Instance = NewConcreteState3()
+	}
+	return concreteState3Instance
+}
 
+type ConcreteState4 struct {
+}
 
-class ConcreteSt1(St):
-    def handle(self, context):
-        context.change_state(ConcreteSt2())
+var concreteState4Instance *ConcreteState4
 
+func NewConcreteState4() *ConcreteState4 {
+	return &ConcreteState4{}
+}
 
-class ConcreteSt2(St):
-    def handle(self, context):
-        context.change_state(ConcreteSt3())
+func (cs4 *ConcreteState4) handle(context *Context) {
+	context.changeState(ConcreteState1Instance())
+}
 
+func ConcreteState4Instance() *ConcreteState4 {
+	if concreteState4Instance == nil {
+		concreteState4Instance = NewConcreteState4()
+	}
+	return concreteState4Instance
+}
 
-class ConcreteSt3(St):
-    def handle(self, context):
-        context.change_state(ConcreteSt4())
+func test(state State, count int) {
+	context := NewContext(state)
+	a := time.Now()
+	for i := 0; i < count; i++ {
+		context.request()
+	}
+	b := time.Now()
+	delta := b.Sub(a)
+	fmt.Println(delta.Seconds())
+}
 
+func main() {
+	state1 := &ConcreteState1{}
+	test(state1, 10)
 
-class ConcreteSt4(St):
-    def handle(self, context):
-        context.change_state(ConcreteSt1())
-
-
-def test(state, count):
-    context = Context(state)
-    a = datetime.datetime.now()
-    for i in range(count):
-        context.request()
-    b = datetime.datetime.now()
-    delta = b - a
-    print(delta.total_seconds())
-
-state1 = ConcreteSt1()
-test(state1, 10)
-
-#using singleton.
-state1 = ConcreteState1.instance()
-test(state1, 10)
-
-"""
-Singleton pattern is used to ristrict the numbrer of object creation. 
-Same way system is automatically reusing the memory. Since ideally the statepattern
-states does not have its internal state or internal variables so the state object 
-which is just freed is resued by the system to create new object. 
-"""
+	// Using singleton.
+	state1 = ConcreteState1Instance()
+	test(state1, 10)
+}

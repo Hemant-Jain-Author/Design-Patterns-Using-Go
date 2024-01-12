@@ -1,78 +1,91 @@
-from abc import ABC, abstractmethod
+package main
 
-class IChatRoom(ABC):
-    @abstractmethod
-    def add_participant(self, participant):
-        pass
+import "fmt"
 
-    @abstractmethod
-    def broadcast(self, message, origin):
-        pass
+// IChatRoom interface
+type IChatRoom interface {
+	AddParticipant(participant *Participant)
+	Broadcast(message, origin string)
+	SendMessage(message, to string)
+}
 
-    @abstractmethod
-    def send_message(self, message, to):
-        pass  
-        
-class ChatRoom(IChatRoom):
-    def __init__(self):
-        self.participants = {}
- 
-    def add_participant(self, participant):
-        self.participants[participant.name] = participant
+// ChatRoom struct implementing IChatRoom
+type ChatRoom struct {
+	participants map[string]*Participant
+}
 
-    def broadcast(self, message, origin):
-        print("ChatRoom broadcast Message : " + message)
-        for p in self.participants:
-            if p != origin:
-                self.participants[p].receive(message)
- 
-    def send_message(self, message, to):
-        self.participants[to].receive(message)
+// AddParticipant adds a participant to the chat room
+func (cr *ChatRoom) AddParticipant(participant *Participant) {
+	cr.participants[participant.name] = participant
+}
 
+// Broadcast sends a message to all participants except the origin
+func (cr *ChatRoom) Broadcast(message, origin string) {
+	fmt.Printf("ChatRoom broadcast Message: %s\n", message)
+	for name, p := range cr.participants {
+		if name != origin {
+			p.Receive(message)
+		}
+	}
+}
 
-class IParticipant(object):
-    def __init__(self, name, chatRoom):
-        pass
-    
-    def broadcast(self, message):
-        pass
+// SendMessage sends a message from one participant to another
+func (cr *ChatRoom) SendMessage(message, to string) {
+	cr.participants[to].Receive(message)
+}
 
-    def send(self, message, to):
-        pass
- 
-    def receive(self, message):
-        pass
+// IParticipant interface
+type IParticipant interface {
+	Broadcast(message string)
+	Send(message, to string)
+	Receive(message string)
+}
 
-class Participant(IParticipant):
-    def __init__(self, name, chatRoom):
-        self.name = name
-        self.chatRoom = chatRoom 
-        self.chatRoom.add_participant(self)
-    
-    def broadcast(self, message):
-        print(self.name + " broadcast Message : " + message)
-        self.chatRoom.broadcast(message, self.name)
+// Participant struct implementing IParticipant
+type Participant struct {
+	name     string
+	chatRoom *ChatRoom
+}
 
-    def send(self, message, to):
-        print(self.name + " sent Message : " + message)
-        self.chatRoom.send_message(message, to)
- 
-    def receive(self, message):
-        print(self.name + " received Message : " + message)
+// NewParticipant creates a new participant and adds it to the chat room
+func NewParticipant(name string, chatRoom *ChatRoom) *Participant {
+	participant := &Participant{name: name, chatRoom: chatRoom}
+	chatRoom.AddParticipant(participant)
+	return participant
+}
 
-# Client code.
-chatRoom = ChatRoom()
-James = Participant("James", chatRoom)
-Michael = Participant("Michael", chatRoom)
-Robert = Participant("Robert", chatRoom)
-Michael.send("Good Morning.", "James")
-James.broadcast("Hello, World!")
+// Broadcast sends a message to all participants
+func (p *Participant) Broadcast(message string) {
+	fmt.Printf("%s broadcast Message: %s\n", p.name, message)
+	p.chatRoom.Broadcast(message, p.name)
+}
 
-"""
-Michael sent Message : Good Morning.
-James received Message : Good Morning.
-James broadcast Message : Hello, World!
-ChatRoom broadcast Message : Hello, World!
-Michael received Message : Hello, World!
-Robert received Message : Hello, World!
-"""
+// Send sends a message from one participant to another
+func (p *Participant) Send(message, to string) {
+	fmt.Printf("%s sent Message: %s\n", p.name, message)
+	p.chatRoom.SendMessage(message, to)
+}
+
+// Receive receives a message
+func (p *Participant) Receive(message string) {
+	fmt.Printf("%s received Message: %s\n", p.name, message)
+}
+
+func main() {
+	chatRoom := &ChatRoom{participants: make(map[string]*Participant)}
+	James := NewParticipant("James", chatRoom)
+	Michael := NewParticipant("Michael", chatRoom)
+	NewParticipant("Robert", chatRoom)
+
+	Michael.Send("Good Morning.", "James")
+	James.Broadcast("Hello, World!")
+}
+
+/*
+Michael sent Message: Good Morning.
+James received Message: Good Morning.
+James broadcast Message: Hello, World!
+ChatRoom broadcast Message: Hello, World!
+Michael received Message: Hello, World!
+Robert received Message: Hello, World!
+*/

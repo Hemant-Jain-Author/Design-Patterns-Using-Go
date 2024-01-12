@@ -1,70 +1,110 @@
-from abc import ABC, abstractmethod
+package main
 
-# A class representing a house
-class House(object):
-    def __init__(self, wall="", roof=""):
-        self.wall = wall
-        self.roof = roof
-        
-    def __str__(self):
-        return "House of %s and %s"%(self.wall,self.roof)
+import "fmt"
 
-# An abstract builder class that specifies the interface for building a house
-class HouseBuilder(ABC):
-    def __init__(self):
-        self.house = House()
+// House struct
+type House struct {
+	Wall string
+	Roof string
+}
 
-    @abstractmethod
-    def set_wall(self):
-        pass
+// NewHouse constructor
+func NewHouse(wall, roof string) *House {
+	return &House{Wall: wall, Roof: roof}
+}
 
-    @abstractmethod
-    def set_roof(self):
-        pass
+// String method for House
+func (h *House) String() string {
+	return fmt.Sprintf("House of %s and %s", h.Wall, h.Roof)
+}
 
-    def get_house(self):
-        temp = self.house
-        self.house = House() # assign new house.
-        return temp
+// HouseBuilder interface
+type HouseBuilder interface {
+	setWall() HouseBuilder
+	setRoof() HouseBuilder
+	getHouse() *House
+}
 
-# A builder class that builds a wooden house
-class WoodenHouseBuilder(HouseBuilder):
-    def set_wall(self):
-        self.house.wall = "Wooden Wall"
-        return self
+// ConcreteHouseBuilder struct
+type ConcreteHouseBuilder struct {
+	house *House
+}
 
-    def set_roof(self):
-        self.house.roof = "Wooden Roof"
-        return self
+// setWall method for ConcreteHouseBuilder
+func (chb *ConcreteHouseBuilder) setWall() HouseBuilder {
+	chb.house.Wall = "Concrete Wall"
+	return chb
+}
 
-# A builder class that builds a concrete house
-class ConcreteHouseBuilder(HouseBuilder):
-    def set_wall(self):
-        self.house.wall = "Concrete Wall"
-        return self
+// setRoof method for ConcreteHouseBuilder
+func (chb *ConcreteHouseBuilder) setRoof() HouseBuilder {
+	chb.house.Roof = "Concrete Roof"
+	return chb
+}
 
-    def set_roof(self):
-        self.house.roof = "Concrete Roof"
-        return self
+// getHouse method for ConcreteHouseBuilder
+func (chb *ConcreteHouseBuilder) getHouse() *House {
+	temp := chb.house
+    chb.house = &House{}
+    return temp
+}
 
-# A class that directs the building of a house
-class HouseDirector:
-    def __init__(self, builder):
-        self._builder = builder
+// WoodenHouseBuilder struct
+type WoodenHouseBuilder struct {
+	house *House
+}
 
-    def construct(self):
-        return self._builder.set_wall().set_roof().get_house()
+// setWall method for WoodenHouseBuilder
+func (whb *WoodenHouseBuilder) setWall() HouseBuilder {
+	whb.house.Wall = "Wooden Wall"
+	return whb
+}
 
-# Client code.
-builder = ConcreteHouseBuilder()
-director = HouseDirector(builder)
-house = director.construct()
-print(house)
+// setRoof method for WoodenHouseBuilder
+func (whb *WoodenHouseBuilder) setRoof() HouseBuilder {
+	whb.house.Roof = "Wooden Roof"
+	return whb
+}
 
-# Building a wooden house using a WoodenHouseBuilder object
-builder = WoodenHouseBuilder()
-director = HouseDirector(builder)
-house2 = director.construct()
-house2.display()
+// getHouse method for WoodenHouseBuilder
+func (whb *WoodenHouseBuilder) getHouse() *House {
+	temp := whb.house
+    whb.house = &House{}
+    return temp
+}
 
-print(house, house2)
+// HouseDirector struct
+type HouseDirector struct {
+	builder HouseBuilder
+}
+
+// NewHouseDirector constructor
+func NewHouseDirector(builder HouseBuilder) *HouseDirector {
+	return &HouseDirector{builder: builder}
+}
+
+// construct method for HouseDirector
+func (hd *HouseDirector) construct() *House {
+	return hd.builder.setWall().setRoof().getHouse()
+}
+
+func main() {
+	// Client code.
+	builder := &ConcreteHouseBuilder{house: &House{}}
+	director := NewHouseDirector(builder)
+
+	house := director.construct()
+	fmt.Println(house)
+
+	// Building a wooden house using a WoodenHouseBuilder object
+	builder2 := &WoodenHouseBuilder{house: &House{}}
+	director2 := NewHouseDirector(builder2)
+
+	house2 := director2.construct()
+	fmt.Println(house2)
+}
+
+/*
+House of Concrete Wall and Concrete Roof
+House of Wooden Wall and Wooden Roof
+*/

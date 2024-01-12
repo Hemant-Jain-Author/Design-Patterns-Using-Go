@@ -1,62 +1,83 @@
-from queue import Queue
-from threading import Thread
-import time
+package main
 
+import (
+	"fmt"
+	"sync"
+)
 
-# MethodRequest encapsulates a method call along with its arguments
-class MethodRequest:
-    def __init__(self, method, args):
-        self.method = method
-        self.args = args
+// MethodRequest encapsulates a method call along with its arguments
+type MethodRequest struct {
+	method func(args ...interface{})
+	args   []interface{}
+}
 
-    def execute(self):
-        self.method(*self.args)
+// ActiveObject encapsulates its own thread of control and executes methods asynchronously
+type ActiveObject struct {
+	queue      chan MethodRequest
+	stopSignal sync.WaitGroup
+	isRunning  bool
+}
 
+// NewActiveObject creates a new ActiveObject
+func NewActiveObject() *ActiveObject {
+	return &ActiveObject{
+		queue:      make(chan MethodRequest),
+		isRunning:  true,
+	}
+}
 
-# ActiveObject encapsulates its own thread of control and executes methods asynchronously
-class ActiveObject(Thread):
-    def __init__(self):
-        super().__init__()
-        self.queue = Queue()
-        self.is_running = True
+// Run starts the ActiveObject's goroutine
+func (a *ActiveObject) Run() {
+	for a.isRunning || len(a.queue) > 0 {
+		methodRequest := <-a.queue
+		methodRequest.method(methodRequest.args...)
+		a.stopSignal.Done() // Decrement the WaitGroup counter
+	}
+}
 
-    def run(self):
-        while self.is_running or not self.queue.empty():
-            method_request = self.queue.get()
-            method_request.execute()
+// ScheduleMethod schedules a method to be executed
+func (a *ActiveObject) ScheduleMethod(method func(args ...interface{}), args ...interface{}) {
+	a.stopSignal.Add(1) // Increment the WaitGroup counter
+	methodRequest := MethodRequest{
+		method: method,
+		args:   args,
+	}
+	a.queue <- methodRequest
+}
 
-    def schedule_method(self, method, *args):
-        method_request = MethodRequest(method, args)
-        self.queue.put(method_request)
+// Stop stops the ActiveObject's goroutine
+func (a *ActiveObject) Stop() {
+	a.isRunning = false
+	go func() {
+		a.stopSignal.Wait() // Wait for the goroutine to finish
+		close(a.queue)
+	}()
+}
 
-    def stop(self):
-        self.is_running = False
-        self.join()
+func main() {
+	// Create an instance of ActiveObject
+	activeObject := NewActiveObject()
 
+    var wg sync.WaitGroup
+	wg.Add(1)
 
-# Proxy acts as a wrapper around the ActiveObject and forwards method calls to it
-class Proxy:
-    def __init__(self, active_object):
-        self.active_object = active_object
+	// Start the ActiveObject goroutine
+	go func() {
+		activeObject.Run()
+		wg.Done()
+	}()
 
-    def invoke_method(self, method, *args):
-        self.active_object.schedule_method(method, *args)
+	// Invoke methods on the ActiveObject
+	activeObject.ScheduleMethod(printMessage, "Hello")
+	activeObject.ScheduleMethod(printMessage, "World")
 
+	// Stop the ActiveObject goroutine
+	activeObject.Stop()
+    wg.Wait()
 
-# Example usage
-def print_message(message):
-    print(message)
+}
 
-# Create an instance of ActiveObject and Proxy
-active_object = ActiveObject()
-proxy = Proxy(active_object)
-
-# Start the ActiveObject thread
-active_object.start()
-
-# Invoke methods on the Proxy
-proxy.invoke_method(print_message, "Hello")
-proxy.invoke_method(print_message, "World")
-
-# Stop the ActiveObject thread
-active_object.stop()
+func printMessage(args ...interface{}) {
+	message := args[0].(string)
+	fmt.Println(message)
+}

@@ -1,39 +1,50 @@
-from abc import ABC, abstractmethod
+package main
 
-class Strategy(ABC):
-    @abstractmethod
-    def execute(self, data):
-        pass
+import "fmt"
 
-class ConcreteStrategy1(Strategy):
-    def execute(self, data):
-        print("ConcreteStrategy1 execute")        
+type Strategy interface {
+	execute(data int)
+}
 
+type ConcreteStrategy1 struct{}
 
-class ConcreteStrategy2(Strategy):
-    def execute(self, data):
-        print("ConcreteStrategy2 execute")
+func (cs1 *ConcreteStrategy1) execute(data int) {
+	fmt.Println("ConcreteStrategy1 execute")
+}
 
+type ConcreteStrategy2 struct{}
 
-class Context:
-    def __init__(self, strategy = ConcreteStrategy1()):
-        self.strategy = strategy
+func (cs2 *ConcreteStrategy2) execute(data int) {
+	fmt.Println("ConcreteStrategy2 execute")
+}
 
-    def set_strategy(self, strategy):
-        self.strategy = strategy
-    
-    def execute(self):
-        data = 1 
-        self.strategy.execute(data)
+type Context struct {
+	strategy Strategy
+}
 
-        
-#Client code.
-c = Context()
-c.execute()
-c.set_strategy(ConcreteStrategy2())
-c.execute()
+func NewContext(strategy Strategy) *Context {
+	return &Context{
+		strategy: strategy,
+	}
+}
 
-"""
+func (c *Context) setStrategy(strategy Strategy) {
+	c.strategy = strategy
+}
+
+func (c *Context) execute() {
+	data := 1
+	c.strategy.execute(data)
+}
+
+func main() {
+	c := NewContext(&ConcreteStrategy1{})
+	c.execute()
+	c.setStrategy(&ConcreteStrategy2{})
+	c.execute()
+}
+
+/*
 ConcreteStrategy1 execute
 ConcreteStrategy2 execute
-"""
+*/

@@ -1,29 +1,41 @@
+package main
 
+import (
+	"errors"
+	"fmt"
+)
 
-class LimitedInstances(object):
-    _instances = []  # Keep track of instance reference
-    limit = 4 
- 
-    def __new__(cls):
-        if not len(cls._instances) <= cls.limit:
-            raise RuntimeError("Instance Limit reached")    
-        instance = object.__new__(cls)
-        cls._instances.append(instance)
-        return instance
-    
-    def __del__(self):
-        # Remove instance from _instances 
-        self._instances.remove(self)
+type LimitedInstances struct {
+}
 
-    
-# Client code. 
-LimitedInstances()
-LimitedInstances()
-LimitedInstances() 
-LimitedInstances()
-LimitedInstances() 
-LimitedInstances()
-LimitedInstances()
-LimitedInstances() 
-LimitedInstances()
-LimitedInstances() 
+var instances []LimitedInstances
+const limit = 4
+
+func NewLimitedInstances() (*LimitedInstances, error) {
+	if len(instances) >= limit {
+		return nil, errors.New("Instance Limit reached")
+	}
+	instance := LimitedInstances{}
+	instances = append(instances, instance)
+	return &instance, nil
+}
+
+func main() {
+	for i := 0; i < 10; i++ {
+		instance, err := NewLimitedInstances()
+		if err != nil {
+			fmt.Println(err)
+			break
+		}
+		fmt.Printf("Instance %d created\n", i+1)
+		_ = instance
+	}
+}
+
+/*
+Instance 1 created
+Instance 2 created
+Instance 3 created
+Instance 4 created
+Instance Limit reached
+*/

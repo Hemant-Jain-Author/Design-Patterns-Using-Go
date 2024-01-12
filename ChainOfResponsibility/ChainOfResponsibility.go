@@ -1,44 +1,60 @@
-from abc import ABC, abstractmethod
+package main
 
-class Handler(ABC):
-    def __init__(self, successor=None):
-        self._successor = successor
+import "fmt"
 
-    @abstractmethod
-    def handle_request(self):
-        pass
+// Handler interface
+type Handler interface {
+	handleRequest()
+}
 
-class ConcreteHandler1(Handler):
-    def handleRequest(self):
-        if True:  # Can handle request.
-            print("Finally handled by ConcreteHandler1")
-        elif self._successor is not None:
-            print("Message passed to next in chain by ConcreteHandler1")
-            self._successor.handleRequest()
+// ConcreteHandler1 struct
+type ConcreteHandler1 struct {
+	successor Handler
+}
 
-class ConcreteHandler2(Handler):
-    def handleRequest(self):
-        if False:  # Can't handle request.
-            print("Finally handled by ConcreteHandler2")
-        elif self._successor is not None:
-            print("Message passed to next in chain by ConcreteHandler2")
-            self._successor.handleRequest()
+// NewConcreteHandler1 constructor
+func NewConcreteHandler1(successor Handler) *ConcreteHandler1 {
+	return &ConcreteHandler1{successor: successor}
+}
 
-class ConcreteHandler3(Handler):
-    def handle_request(self, request):
-        if request == 'request3':
-            print('ConcreteHandler3 handles the request3.')
-        elif self._successor:
-            self._successor.handle_request(request)
+// handleRequest method for ConcreteHandler1
+func (ch1 *ConcreteHandler1) handleRequest() {
+	if true { // Can handle request.
+		fmt.Println("Finally handled by ConcreteHandler1")
+	} else if ch1.successor != nil {
+		fmt.Println("Message passed to next in chain by ConcreteHandler1")
+		ch1.successor.handleRequest()
+	}
+}
 
-# Client Code
-ch1 = ConcreteHandler1()
-ch2 = ConcreteHandler2(ch1)
-ch2.handleRequest()
+// ConcreteHandler2 struct
+type ConcreteHandler2 struct {
+	successor Handler
+}
 
-"""
-Output:
-    Message passed to next in chain by ConcreteHandler2
-    Finally handled by ConcreteHandler1
+// NewConcreteHandler2 constructor
+func NewConcreteHandler2(successor Handler) *ConcreteHandler2 {
+	return &ConcreteHandler2{successor: successor}
+}
 
-"""
+// handleRequest method for ConcreteHandler2
+func (ch2 *ConcreteHandler2) handleRequest() {
+	if false { // Can't handle request.
+		fmt.Println("Finally handled by ConcreteHandler2")
+	} else if ch2.successor != nil {
+		fmt.Println("Message passed to next in chain by ConcreteHandler2")
+		ch2.successor.handleRequest()
+	}
+}
+
+func main() {
+	// Client code.
+	ch1 := NewConcreteHandler1(nil)
+	ch2 := NewConcreteHandler2(ch1)
+	ch2.handleRequest()
+}
+
+/*
+Message passed to next in chain by ConcreteHandler2
+Finally handled by ConcreteHandler1
+*/

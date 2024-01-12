@@ -1,61 +1,68 @@
-import threading
+package main
 
-class Barrier:
-    def __init__(self, count):
-        self.count = count
-        self.barrier_lock = threading.Lock()
-        self.barrier_cond = threading.Condition(self.barrier_lock)
+import (
+	"fmt"
+	"sync"
+)
 
-    def wait(self):
-        with self.barrier_lock:
-            self.count -= 1
-            if self.count > 0:
-                self.barrier_cond.wait()
-            else:
-                self.barrier_cond.notify_all()
+// Barrier represents a synchronization barrier
+type Barrier struct {
+	count       int
+	barrierLock sync.Mutex
+	barrierCond *sync.Cond
+}
 
+// NewBarrier creates a new Barrier
+func NewBarrier(count int) *Barrier {
+	b := &Barrier{
+		count:       count,
+		barrierCond: sync.NewCond(&sync.Mutex{}),
+	}
+	return b
+}
 
-def worker(barrier, id):
-    print(f"Worker {id} started")
-    # Simulating some work
-    for i in range(3):
-        print(f"Worker {id} working...")
-        # Simulating some computation
-    print(f"Worker {id} finished")
-    barrier.wait()
+// Wait waits for all goroutines to reach the barrier
+func (b *Barrier) Wait() {
+	b.barrierLock.Lock()
+	defer b.barrierLock.Unlock()
 
+	b.count--
 
-# Client code.
-num_workers = 3
-barrier = Barrier(num_workers)
+	if b.count > 0 {
+		b.barrierCond.Wait()
+	} else {
+		b.barrierCond.Broadcast()
+	}
+}
 
-threads = []
-for i in range(num_workers):
-    t = threading.Thread(target=worker, args=(barrier, i))
-    t.start()
-    threads.append(t)
+func worker(b *Barrier, id int) {
+	fmt.Printf("Worker %d started\n", id)
+	// Simulating some work
+	for i := 0; i < 3; i++ {
+		fmt.Printf("Worker %d working...\n", id)
+		// Simulating some computation
+	}
+	fmt.Printf("Worker %d finished\n", id)
+	b.Wait()
+}
 
-for t in threads:
-    t.join()
+func main() {
+	// Create a barrier with the specified number of workers
+	numWorkers := 3
+	barrier := NewBarrier(numWorkers)
 
-print("All workers finished. Proceeding to the next step.")
+	// Start worker goroutines
+	var wg sync.WaitGroup
+	for i := 0; i < numWorkers; i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			worker(barrier, i)
+		}(i)
+	}
 
+	// Wait for all workers to finish
+	wg.Wait()
 
-"""
-Worker 0 started
-Worker 0 working...
-Worker 0 working...
-Worker 0 working...
-Worker 0 finished
-Worker 1 started
-Worker 1 working...
-Worker 1 working...
-Worker 1 working...
-Worker 1 finished
-Worker 2 started
-Worker 2 working...
-Worker 2 working...
-Worker 2 working...
-Worker 2 finished
-All workers finished. Proceeding to the next step.
-"""
+	fmt.Println("All workers finished. Proceeding to the next step.")
+}

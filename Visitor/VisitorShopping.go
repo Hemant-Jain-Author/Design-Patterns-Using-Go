@@ -1,76 +1,99 @@
-from abc import ABC, abstractmethod
+package main
 
-class Element(ABC):  
-    @abstractmethod
-    def accept(self, visitor):
-        pass
+import (
+	"fmt"
+)
 
-class Book(Element):
-    def __init__(self, price, isbn):
-        self.price = price
-        self.isbn = isbn
-        
-    def accept(self, visitor):
-        return visitor.visit_book(self)
+// Element is the abstract class defining the accept method.
+type Element interface {
+	accept(visitor Visitor) float64
+}
 
-class Fruit(Element):
-    def __init__(self, price, quantity, type):
-        self.price = price
-        self.quantity = quantity
-        self.type = type
+// Book is a concrete implementation of Element for books.
+type Book struct {
+	price float64
+	isbn  int
+}
 
-    def accept(self, visitor):
-        return visitor.visit_fruit(self) * self.quantity
+func (b *Book) accept(visitor Visitor) float64 {
+	return visitor.visitBook(b)
+}
 
-class Visitor(ABC):
-    def visit_book(self, element):
-        pass
+// Fruit is another concrete implementation of Element for fruits.
+type Fruit struct {
+	price    float64
+	quantity int
+	typeName string
+}
 
-    def visit_fruit(self, element):
-        pass
+func (f *Fruit) accept(visitor Visitor) float64 {
+	return visitor.visitFruit(f) * float64(f.quantity)
+}
 
-class SundayDiscount(Visitor):
-    def visit_book(self, element):
-        return element.price - 50
+// Visitor is the abstract class defining the visit methods.
+type Visitor interface {
+	visitBook(book *Book) float64
+	visitFruit(fruit *Fruit) float64
+}
 
-    def visit_fruit(self, element):
-        return element.price - 5
+// SundayDiscount is a concrete implementation of Visitor for Sunday discounts.
+type SundayDiscount struct{}
 
-class SaleDiscount(Visitor):
-    def visit_book(self, element):
-        return (element.price / 2)
+func (v *SundayDiscount) visitBook(book *Book) float64 {
+	return book.price - 50
+}
 
-    def visit_fruit(self, element):
-        return (element.price / 2)
-        
-class ShoppingCart:
-    def __init__(self):
-        self.list = []
+func (v *SundayDiscount) visitFruit(fruit *Fruit) float64 {
+	return fruit.price - 5
+}
 
-    def add(self, o):
-        self.list.append(o)
+// SaleDiscount is another concrete implementation of Visitor for sale discounts.
+type SaleDiscount struct{}
 
-    def set_discount_visitor(self, discount):
-        self.visitor = discount
+func (v *SaleDiscount) visitBook(book *Book) float64 {
+	return book.price / 2
+}
 
-    def accept(self):
-        cost = 0
-        for o in self.list:
-            cost += o.accept(self.visitor)
-        print("total cost : ", cost)
-    
-    
-# Client Code
-os = ShoppingCart()
-os.add(Fruit(100,10,"Apple"))
-os.add(Book(100,12345))
-os.set_discount_visitor(SundayDiscount())
-os.accept()
+func (v *SaleDiscount) visitFruit(fruit *Fruit) float64 {
+	return fruit.price / 2
+}
 
-os.set_discount_visitor(SaleDiscount())
-os.accept()
+// ShoppingCart is the structure holding a list of items.
+type ShoppingCart struct {
+	list    []Element
+	visitor Visitor
+}
 
-"""
-total cost :  1000
-total cost :  550.0
-"""
+func (os *ShoppingCart) add(o Element) {
+	os.list = append(os.list, o)
+}
+
+func (os *ShoppingCart) setDiscountVisitor(discount Visitor) {
+	os.visitor = discount
+}
+
+func (os *ShoppingCart) accept() {
+	cost := 0.0
+	for _, o := range os.list {
+		cost += o.accept(os.visitor)
+	}
+	fmt.Printf("total cost : %.2f\n", cost)
+}
+
+func main() {
+	// Client Code
+	os := &ShoppingCart{}
+	os.add(&Fruit{100, 10, "Apple"})
+	os.add(&Book{100, 12345})
+
+	os.setDiscountVisitor(&SundayDiscount{})
+	os.accept()
+
+	os.setDiscountVisitor(&SaleDiscount{})
+	os.accept()
+}
+
+/*
+total cost : 1000.00
+total cost : 550.00
+*/

@@ -1,78 +1,119 @@
-from abc import ABC, abstractmethod
+package main
 
-class IShape:
-    @abstractmethod
-    def move(self, x, y):
-        pass
+import "fmt"
 
-    @abstractmethod    
-    def draw(self):
-        pass
+// IShape interface
+type IShape interface {
+	move(x, y int)
+	draw() string
+}
 
-class Rectangle(IShape):
-    def __init__(self, x, y, l, b):
-        self.x = x
-        self.y = y
-        self.l = l
-        self.b = b
+// Rectangle struct
+type Rectangle struct {
+	x, y, l, b int
+}
 
-    def move(self, x, y):
-        self.x += x
-        self.y += y
+// NewRectangle constructor for Rectangle
+func NewRectangle(x, y, l, b int) *Rectangle {
+	return &Rectangle{x: x, y: y, l: l, b: b}
+}
 
-    def draw(self):
-        print("Draw a Rectangle at (%s, %s)."%(self.x, self.y))
-        return "<Rectangle>"
+// move method for Rectangle
+func (r *Rectangle) move(x, y int) {
+	r.x += x
+	r.y += y
+}
 
-class Circle(IShape):
-    def __init__(self, x, y, radius):
-        self.x = x
-        self.y = y
-        self.radius = radius
+// draw method for Rectangle
+func (r *Rectangle) draw() string {
+	fmt.Printf("Draw a Rectangle at (%d, %d).\n", r.x, r.y)
+	return "<Rectangle>"
+}
 
-    def move(self, x, y):
-        self.x += x
-        self.y += y
+// Circle struct
+type Circle struct {
+	x, y, radius int
+}
 
-    def draw(self):
-        print("Draw a Circle of radius %s at (%s, %s) ."%(self.radius, self.x, self.y))
-        return "<Circle>"
+// NewCircle constructor for Circle
+func NewCircle(x, y, radius int) *Circle {
+	return &Circle{x: x, y: y, radius: radius}
+}
 
-class CompoundShape(IShape):
-    def __init__(self):
-        self.children = set()
-    
-    def add(self, child):
-        self.children.add(child)
+// move method for Circle
+func (c *Circle) move(x, y int) {
+	c.x += x
+	c.y += y
+}
 
-    def remove(self, child):
-        self.children.remove(child)
+// draw method for Circle
+func (c *Circle) draw() string {
+	fmt.Printf("Draw a Circle of radius %d at (%d, %d) .\n", c.radius, c.x, c.y)
+	return "<Circle>"
+}
 
-    def move(self, x, y):
-        for child in self.children:
-            child.move(x, y)
+// CompoundShape struct
+type CompoundShape struct {
+	children []IShape
+}
 
-    def draw(self):
-        st = "Shapes("
-        for child in self.children:
-            st += child.draw()
-        st += ")"
-        return st
+// NewCompoundShape constructor for CompoundShape
+func NewCompoundShape() *CompoundShape {
+	return &CompoundShape{
+		children: make([]IShape, 0),
+	}
+}
 
-# Client code.      
-all =  CompoundShape()
-all.add( Rectangle(1, 2, 1, 2))
-all.add( Circle(5, 3, 10))
-group = CompoundShape()
-group.add(Rectangle(5, 7, 1, 2))
-group.add(Circle(2, 1, 2))
-all.add(group)
-print(all.draw())
+// add method for CompoundShape
+func (cs *CompoundShape) add(child IShape) {
+	cs.children = append(cs.children, child)
+}
 
-"""
+// remove method for CompoundShape
+func (cs *CompoundShape) remove(child IShape) {
+	for i, c := range cs.children {
+		if c == child {
+			cs.children = append(cs.children[:i], cs.children[i+1:]...)
+			break
+		}
+	}
+}
+
+// move method for CompoundShape
+func (cs *CompoundShape) move(x, y int) {
+	for _, child := range cs.children {
+		child.move(x, y)
+	}
+}
+
+// draw method for CompoundShape
+func (cs *CompoundShape) draw() string {
+	st := "Shapes("
+	for _, child := range cs.children {
+		st += child.draw()
+	}
+	st += ")"
+	return st
+}
+
+func main() {
+	// Client code.
+	all := NewCompoundShape()
+	all.add(NewRectangle(1, 2, 1, 2))
+	all.add(NewCircle(5, 3, 10))
+
+	group := NewCompoundShape()
+	group.add(NewRectangle(5, 7, 1, 2))
+	group.add(NewCircle(2, 1, 2))
+
+	all.add(group)
+	fmt.Println(all.draw())
+}
+
+/*
 Draw a Rectangle at (1, 2).
-Draw a Circle of radius 2 at (2, 1) .
-Draw a Rectangle at (5, 7).
 Draw a Circle of radius 10 at (5, 3) .
-Shapes(<Rectangle>Shapes(<Circle><Rectangle>)<Circle>)
-"""
+Draw a Rectangle at (5, 7).
+Draw a Circle of radius 2 at (2, 1) .
+Shapes(<Rectangle><Circle>Shapes(<Rectangle><Circle>))
+*/

@@ -1,26 +1,39 @@
-from abc import ABC, abstractmethod
+package main
 
-class Subject(ABC):
-    @abstractmethod
-    def request(self):
-        pass
+import "fmt"
 
-class RealSubject(Subject):
-    def request(self):
-        print("Concrete Subject Request Method")
+// Subject is an interface representing a subject.
+type Subject interface {
+	Request()
+}
 
-class Proxy(Subject):
-    def __init__(self):
-        self._concSub = RealSubject()
+// RealSubject is a concrete implementation of the Subject interface.
+type RealSubject struct{}
 
-    def request(self):
-        self._concSub.request()
+func (rs *RealSubject) Request() {
+	fmt.Println("Concrete Subject Request Method")
+}
 
+// Proxy is a proxy implementation of the Subject interface.
+type Proxy struct {
+	concSub *RealSubject
+}
 
-# Client code
-proxy = Proxy()
-proxy.request()
+func NewProxy() *Proxy {
+	return &Proxy{
+		concSub: &RealSubject{},
+	}
+}
 
-"""
+func (p *Proxy) Request() {
+	p.concSub.Request()
+}
+
+func main() {
+	proxy := NewProxy()
+	proxy.Request()
+}
+
+/*
 Concrete Subject Request Method
-"""
+*/

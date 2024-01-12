@@ -1,44 +1,79 @@
-from abc import ABC, abstractmethod
+package main
 
-class Agent: # invoker 
-    def place_order(self, command):
-        command.execute()
+import "fmt"
 
-class Order(ABC): 
-    @abstractmethod
-    def execute(self):
-        pass
+// Agent struct (Invoker)
+type Agent struct{}
 
-class BuyStockOrder(Order):
-    def __init__(self, stock):
-        self.stock = stock
-    
-    def execute(self):
-        self.stock.buy()
+// placeOrder method for Agent
+func (a *Agent) placeOrder(command Order) {
+	command.execute()
+}
 
-class SellStockOrder(Order):
-    def __init__(self, stock):
-        self.stock = stock
+// Order interface
+type Order interface {
+	execute()
+}
 
-    def execute(self):
-        self.stock.sell()
+// BuyStockOrder struct
+type BuyStockOrder struct {
+	stock *ReceiverStockTrade
+}
 
-class ReceiverStockTrade:  # Receiver
-    def buy(self):
-        print("Buy stocks")
-    
-    def sell(self):
-        print("Sell stocks")
+// NewBuyStockOrder constructor
+func NewBuyStockOrder(stock *ReceiverStockTrade) *BuyStockOrder {
+	return &BuyStockOrder{
+		stock: stock,
+	}
+}
 
-# Client code.
-trader = ReceiverStockTrade()
-buyStock = BuyStockOrder(trader)
-sellStock = SellStockOrder(trader)
-agent = Agent()
-agent.place_order(buyStock)
-agent.place_order(sellStock)
+// execute method for BuyStockOrder
+func (b *BuyStockOrder) execute() {
+	b.stock.buy()
+}
 
-"""
+// SellStockOrder struct
+type SellStockOrder struct {
+	stock *ReceiverStockTrade
+}
+
+// NewSellStockOrder constructor
+func NewSellStockOrder(stock *ReceiverStockTrade) *SellStockOrder {
+	return &SellStockOrder{
+		stock: stock,
+	}
+}
+
+// execute method for SellStockOrder
+func (s *SellStockOrder) execute() {
+	s.stock.sell()
+}
+
+// ReceiverStockTrade struct (Receiver)
+type ReceiverStockTrade struct{}
+
+// buy method for ReceiverStockTrade
+func (r *ReceiverStockTrade) buy() {
+	fmt.Println("Buy stocks")
+}
+
+// sell method for ReceiverStockTrade
+func (r *ReceiverStockTrade) sell() {
+	fmt.Println("Sell stocks")
+}
+
+func main() {
+	// Client code.
+	trader := &ReceiverStockTrade{}
+	buyStock := NewBuyStockOrder(trader)
+	sellStock := NewSellStockOrder(trader)
+	agent := &Agent{}
+	agent.placeOrder(buyStock)
+	agent.placeOrder(sellStock)
+}
+
+
+/*
 Buy stocks
 Sell stocks
-"""
+*/

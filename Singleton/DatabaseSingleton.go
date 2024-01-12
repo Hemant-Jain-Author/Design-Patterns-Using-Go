@@ -1,35 +1,82 @@
-import sqlite3
-import sys
+package main
 
-class Database(object):
-    _instance = None  # Keep instance reference 
-    def __new__(cls):
-        if not cls._instance:
-            cls._instance = super().__new__(cls)
-            print("database created")
-            cls.connection = sqlite3.connect("db.sqlite3")
-            cls.cursorobj = cls.connection.cursor()
-        return cls._instance      
-    
-    def create_table(self):
-        self.cursorobj.execute("CREATE TABLE IF NOT EXISTS students ( id integer ,name text);")
+import (
+	"database/sql"
+	"fmt"
+	"log"
+	"os"
 
-    def add_data(self, id, name):
-        query = "INSERT INTO students (id, name) VALUES (%s, \'%s\');" % (id, name)
-        self.cursorobj.execute(query)
+	_ "github.com/mattn/go-sqlite3"
+)
 
-    def display(self):
-        self.cursorobj.execute("SELECT * FROM students;")
-        rows = self.cursorobj.fetchall()
-        for row in rows:
-            print(row)
+type Database struct {
+	connection *sql.DB
+	cursorobj  *sql.Stmt
+}
 
-# Client code. 
-db1 = Database()
-db2 = Database()
-print ("Database Objects DB1", db1)
-print ("Database Objects DB2", db2)
-db1.create_table()
-db1.add_data(1, "john")
-db2.add_data(2, "smith")
-db1.display()
+var instance *Database
+
+func NewDatabase() *Database {
+	if instance == nil {
+		instance = &Database{}
+		fmt.Println("Database created")
+		var err error
+		instance.connection, err = sql.Open("sqlite3", "db.sqlite3")
+		if err != nil {
+			log.Fatal(err)
+			os.Exit(1)
+		}
+	}
+	return instance
+}
+
+func (db *Database) createTable() {
+	_, err := db.connection.Exec("CREATE TABLE IF NOT EXISTS students (id INTEGER, name TEXT);")
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+}
+
+func (db *Database) addData(id int, name string) {
+	query := fmt.Sprintf("INSERT INTO students (id, name) VALUES (%d, '%s');", id, name)
+	_, err := db.connection.Exec(query)
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+}
+
+func (db *Database) display() {
+	rows, err := db.connection.Query("SELECT * FROM students;")
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var id int
+		var name string
+		err := rows.Scan(&id, &name)
+		if err != nil {
+			log.Fatal(err)
+			os.Exit(1)
+		}
+		fmt.Println(id, name)
+	}
+}
+
+func main() {
+	db1 := NewDatabase()
+	db2 := NewDatabase()
+
+	fmt.Println("Database Objects DB1", db1)
+	fmt.Println("Database Objects DB2", db2)
+
+	db1.createTable()
+	db1.addData(1, "john")
+	db2.addData(2, "smith")
+
+	db1.display()
+}

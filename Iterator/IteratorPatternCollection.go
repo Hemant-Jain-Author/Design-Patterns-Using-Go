@@ -1,32 +1,77 @@
-import collections.abc
+package main
 
-class ConcreteAggregate(collections.abc.Iterable):
-    def __init__(self):
-        self._data = []
+import (
+	"fmt"
+)
 
-    def add_data(self, val):
-        self._data.append(val)
+// Iterable interface
+type Iterable interface {
+	NewIterator() Iterator
+}
 
-    def __iter__(self):
-        return ConcreteIterator(self)
+// Iterator interface
+type Iterator interface {
+	Next() interface{}
+	HasNext() bool
+}
 
+// ConcreteAggregate struct
+type ConcreteAggregate struct {
+	data []int
+}
 
-class ConcreteIterator(collections.abc.Iterator):
-    def __init__(self, aggregate):
-        self._aggregate = aggregate
-        self._index = 0
+// NewConcreteAggregate creates a new ConcreteAggregate instance
+func NewConcreteAggregate() *ConcreteAggregate {
+	return &ConcreteAggregate{
+		data: make([]int, 0),
+	}
+}
 
-    def __next__(self):
-        if self._index >= len(self._aggregate._data):  # if no_elements_to_traverse:
-            raise StopIteration
-        val = self._aggregate._data[self._index]
-        self._index += 1
-        return val
+// AddData adds data to ConcreteAggregate
+func (ca *ConcreteAggregate) AddData(val int) {
+	ca.data = append(ca.data, val)
+}
 
-# Client code
-aggregate = ConcreteAggregate()
-for i in range(10):
-    aggregate.add_data(i)
+// NewIterator creates a new iterator for ConcreteAggregate
+func (ca *ConcreteAggregate) NewIterator() Iterator {
+	return &ConcreteIterator{
+		aggregate: ca,
+		index:     0,
+	}
+}
 
-for val in aggregate:
-    print(val)
+// ConcreteIterator struct
+type ConcreteIterator struct {
+	aggregate *ConcreteAggregate
+	index     int
+}
+
+// Next returns the next element in the iteration
+func (ci *ConcreteIterator) Next() interface{} {
+	if ci.index >= len(ci.aggregate.data) {
+		return nil
+	}
+	val := ci.aggregate.data[ci.index]
+	ci.index++
+	return val
+}
+
+// HasNext returns true if there are more elements in the iteration
+func (ci *ConcreteIterator) HasNext() bool {
+	return ci.index < len(ci.aggregate.data)
+}
+
+func main() {
+	aggregate := NewConcreteAggregate()
+
+	for i := 0; i < 10; i++ {
+		aggregate.AddData(i)
+	}
+
+	iterator := aggregate.NewIterator()
+
+	for iterator.HasNext() {
+		val := iterator.Next().(int)
+		fmt.Print(val, " ")
+	}
+}

@@ -1,23 +1,38 @@
-from abc import ABC, abstractmethod
+package main
 
-class AbstractExpression(ABC):
-    @abstractmethod
-    def interpret(self):
-        pass
+import "fmt"
 
-class NonterminalExpression(AbstractExpression):
-    def __init__(self, expression):
-        self._expression = expression
+// AbstractExpression interface
+type AbstractExpression interface {
+	interpret()
+}
 
-    def interpret(self):
-        print("NonTerminalExpression:interpret")
-        self._expression.interpret()
+// NonterminalExpression struct
+type NonterminalExpression struct {
+	expression AbstractExpression
+}
 
+func (n *NonterminalExpression) interpret() {
+	fmt.Println("NonterminalExpression:interpret")
+	n.expression.interpret()
+}
 
-class TerminalExpression(AbstractExpression):
-    def interpret(self):
-        print("TerminalExpression:interpret")
+// TerminalExpression struct
+type TerminalExpression struct{}
 
-#Client Code.
-tree = NonterminalExpression(TerminalExpression())
-tree.interpret()
+func (t *TerminalExpression) interpret() {
+	fmt.Println("TerminalExpression:interpret")
+}
+
+// Client code
+func main() {
+	tree := &NonterminalExpression{
+		expression: &TerminalExpression{},
+	}
+	tree.interpret()
+}
+
+/*
+NonterminalExpression:interpret
+TerminalExpression:interpret
+*/

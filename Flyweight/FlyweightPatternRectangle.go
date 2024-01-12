@@ -1,34 +1,60 @@
-from abc import ABC, abstractmethod
-import random
+package main
 
-class Shape(ABC):
-    def __init__(self, colour):
-        self._colour = colour # Intrinsic State
+import (
+	"fmt"
+	"math/rand"
+)
 
-    @abstractmethod
-    def draw(self, x1, y1, x2, y2): # Extrinsic State
-        print
+// Shape interface
+type Shape interface {
+	Draw(x1, y1, x2, y2 int)
+}
 
-class Rectange(Shape):
-    def draw(self, x1, y1, x2, y2):
-        print("Draw rectange colour:%s topleft: (%s,%s) rightBottom: (%s,%s)"%(self._colour,x1, y1, x2, y2) )
+// Rectangle type
+type Rectangle struct {
+	colour string // Intrinsic State
+}
 
-class RectangeFactory:
-    def __init__(self):
-        self._shapes = {}
+func NewRectangle(colour string) *Rectangle {
+	return &Rectangle{colour: colour}
+}
 
-    def get_rectange(self, colour):
-        if colour not in self._shapes:
-            self._shapes[colour] = Rectange(colour)
-        return self._shapes[colour]
-    
-    def get_count(self):
-        return len(self._shapes)
+func (r *Rectangle) Draw(x1, y1, x2, y2 int) {
+	fmt.Printf("Draw rectangle colour:%s topleft: (%d,%d) rightBottom: (%d,%d)\n", r.colour, x1, y1, x2, y2)
+}
 
-# Client code.
-factory = RectangeFactory()
-for i in range(1000):
-    rect = factory.get_rectange(random.randint(1,1000))
-    rect.draw(random.randint(1,100), random.randint(1,100), random.randint(1,100), random.randint(1,100))
-print(factory.get_count())
+// RectangleFactory type
+type RectangleFactory struct {
+	shapes map[string]Shape
+}
 
+func NewRectangleFactory() *RectangleFactory {
+	return &RectangleFactory{
+		shapes: make(map[string]Shape),
+	}
+}
+
+func (rf *RectangleFactory) GetRectangle(colour string) Shape {
+	if shape, exists := rf.shapes[colour]; exists {
+		return shape
+	}
+
+	shape := NewRectangle(colour)
+	rf.shapes[colour] = shape
+	return shape
+}
+
+func (rf *RectangleFactory) GetCount() int {
+	return len(rf.shapes)
+}
+
+func main() {
+	// Client code
+	factory := NewRectangleFactory()
+	for i := 0; i < 1000; i++ {
+		colour := fmt.Sprintf("%d", rand.Intn(1000))
+		rect := factory.GetRectangle(colour)
+		rect.Draw(rand.Intn(100), rand.Intn(100), rand.Intn(100), rand.Intn(100))
+	}
+	fmt.Println(factory.GetCount())
+}

@@ -1,38 +1,64 @@
-class SystemManagerFacade:
-    def __init__(self):
-        self._subsystem1 = Subsystem1()
-        self._subsystem2 = Subsystem2()
+package main
 
-    def operation(self):
-        self._subsystem1.operation1()
-        self._subsystem1.operation2()
-        self._subsystem2.operation1()
-        self._subsystem2.operation2()
+import "fmt"
 
-class Subsystem1:
-    def operation1(self):
-        print("Subsystem1 operation1")
+// Subsystem1 represents the first subsystem
+type Subsystem1 struct{}
 
-    def operation2(self):
-        print("Subsystem1 operation2")
+// Operation1 implements the first operation of Subsystem1
+func (s *Subsystem1) Operation1() {
+	fmt.Println("Subsystem1 operation1")
+}
 
+// Operation2 implements the second operation of Subsystem1
+func (s *Subsystem1) Operation2() {
+	fmt.Println("Subsystem1 operation2")
+}
 
-class Subsystem2:
-    def operation1(self):
-        print("Subsystem2 operation1")
+// Subsystem2 represents the second subsystem
+type Subsystem2 struct{}
 
-    def operation2(self):
-        print("Subsystem2 operation2")
+// Operation1 implements the first operation of Subsystem2
+func (s *Subsystem2) Operation1() {
+	fmt.Println("Subsystem2 operation1")
+}
 
-# Client code
-facade = SystemManagerFacade()
-facade.operation()
+// Operation2 implements the second operation of Subsystem2
+func (s *Subsystem2) Operation2() {
+	fmt.Println("Subsystem2 operation2")
+}
 
-"""
-Output:
+// SystemManagerFacade represents the facade for the subsystems
+type SystemManagerFacade struct {
+	subsystem1 *Subsystem1
+	subsystem2 *Subsystem2
+}
+
+// NewSystemManagerFacade creates a new SystemManagerFacade
+func NewSystemManagerFacade() *SystemManagerFacade {
+	return &SystemManagerFacade{
+		subsystem1: &Subsystem1{},
+		subsystem2: &Subsystem2{},
+	}
+}
+
+// Operation invokes operations on subsystems
+func (f *SystemManagerFacade) Operation() {
+	f.subsystem1.Operation1()
+	f.subsystem1.Operation2()
+	f.subsystem2.Operation1()
+	f.subsystem2.Operation2()
+}
+
+func main() {
+	// Client code
+	facade := NewSystemManagerFacade()
+	facade.Operation()
+}
+
+/*
 Subsystem1 operation1
 Subsystem1 operation2
 Subsystem2 operation1
 Subsystem2 operation2
-
-"""
+*/

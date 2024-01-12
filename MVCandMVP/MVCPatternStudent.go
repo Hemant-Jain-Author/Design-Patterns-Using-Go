@@ -1,61 +1,80 @@
-class Student:
-    def __init__(self, name, id):
-        self.name = name
-        self.id = id
+package main
 
-class Model(object):
-    # Dummy model which just have one object.  
-    # Model is supposed to interact with database.
-    def __init__(self):
-        self.st = Student("Harry", 1)
+import "fmt"
 
-    def set_data(self, name, id):
-        print("Model: Set data :", name, id)
-        self.st.name = name
-        self.st.id = id
+type Student struct {
+    Name string
+    ID   int
+}
 
-    def get_data(self):
-        print("Model: Get data.")
-        return self.st
+type Model struct {
+    st Student
+}
 
-class View(object):
-    # Dummy view which is print some data to standard output.
-    # View is supposed to intaract the UI. 
-    def __init__(self, model):
-        self.model = model
+func NewModel() *Model {
+    return &Model{st: Student{Name: "Harry", ID: 1}}
+}
 
-    # In classic MVC view interact with the model to get data.
-    def update(self):
-        st = self.model.get_data()
-        print("View: Student Info : ", st.name , st.id)
+func (m *Model) SetData(name string, id int) {
+    fmt.Println("Model: Set data:", name, id)
+    m.st.Name = name
+    m.st.ID = id
+}
 
-class Controller(object):
-    def __init__(self):
-        self.model = Model()
-        self.view = View(self.model)
+func (m *Model) GetData() Student {
+    fmt.Println("Model: Get data.")
+    return m.st
+}
 
-    def set_data(self, name, id):
-        print("Controller: Receive data from client.")
-        self.model.set_data(name, id)
+type View struct {
+    model *Model
+}
 
-    def update_view(self):
-        print("Controller: Receive update view from client.")
-        self.view.update()
+func NewView(model *Model) *View {
+    return &View{model: model}
+}
 
-# Client code
-controller = Controller()
-controller.update_view()
+func (v *View) Update() {
+    st := v.model.GetData()
+    fmt.Println("View: Student Info :", st.Name, st.ID)
+}
 
-controller.set_data("jack", 2)
-controller.update_view()
+type Controller struct {
+    model *Model
+    view  *View
+}
 
-"""
+func NewController() *Controller {
+    model := NewModel()
+    view := NewView(model)
+    return &Controller{model: model, view: view}
+}
+
+func (c *Controller) SetData(name string, id int) {
+    fmt.Println("Controller: Receive data from client.")
+    c.model.SetData(name, id)
+}
+
+func (c *Controller) UpdateView() {
+    fmt.Println("Controller: Receive update view from client.")
+    c.view.Update()
+}
+
+func main() {
+    controller := NewController()
+    controller.UpdateView()
+
+    controller.SetData("jack", 2)
+    controller.UpdateView()
+}
+
+/*
 Controller: Receive update view from client.
 Model: Get data.
-View: Student Info :  Harry 1
+View: Student Info : Harry 1
 Controller: Receive data from client.
-Model: Set data : jack 2
+Model: Set data: jack 2
 Controller: Receive update view from client.
 Model: Get data.
-View: Student Info :  jack 2
-"""
+View: Student Info : jack 2
+*/

@@ -1,46 +1,63 @@
-from abc import ABC, abstractmethod
-import math
+package main
 
-class BulbControl:
-    def __init__(self):
-        self.current = Off()
-    
-    def set_state(self, state):
-        self.current = state
+import "fmt"
 
-    def flip(self):
-        self.current.flip(self)
+type BulbControl struct {
+	current BulbState
+}
 
-    def to_string(self):
-        return self.current.to_string()
+func NewBulbControl() *BulbControl {
+	return &BulbControl{
+		current: &Off{},
+	}
+}
 
-class BulbState(ABC):
-    @abstractmethod
-    def flip(self):
-        pass
+func (bc *BulbControl) setState(state BulbState) {
+	bc.current = state
+}
 
-class On(BulbState):
-    def flip(self, bc):
-        bc.set_state(Off())
+func (bc *BulbControl) flip() {
+	bc.current.flip(bc)
+}
 
-    def to_string(self):
-        return "On"
+func (bc *BulbControl) toString() string {
+	return bc.current.toString()
+}
 
-class Off(BulbState):
-    def flip(self, bc):
-        bc.set_state(On())
+type BulbState interface {
+	flip(bc *BulbControl)
+	toString() string
+}
 
-    def to_string(self):
-        return "Off"
+type On struct{}
 
-# Client code.
-c = BulbControl()
-c.flip()
-print(c.to_string())
-c.flip()
-print(c.to_string())
+func (o *On) flip(bc *BulbControl) {
+	bc.setState(&Off{})
+}
 
-"""
+func (o *On) toString() string {
+	return "On"
+}
+
+type Off struct{}
+
+func (off *Off) flip(bc *BulbControl) {
+	bc.setState(&On{})
+}
+
+func (off *Off) toString() string {
+	return "Off"
+}
+
+func main() {
+	c := NewBulbControl()
+	c.flip()
+	fmt.Println(c.toString())
+	c.flip()
+	fmt.Println(c.toString())
+}
+
+/*
 On
 Off
-"""
+*/

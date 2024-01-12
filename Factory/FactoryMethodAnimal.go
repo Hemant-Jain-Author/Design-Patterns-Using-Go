@@ -1,51 +1,76 @@
-from abc import ABC, abstractmethod
-class Animal(ABC):
-    @abstractmethod
-    def voice(self):
-        pass
+package main
 
-class Dog(Animal):
-    def voice(self):
-        print("Bhow Bhow!!")
+import "fmt"
 
-class Cat(Animal):
-    def voice(self):
-        print("Meow Meow!!")
+// Animal interface
+type Animal interface {
+	Voice()
+}
 
-## Animal factory defined
-class AnimalFactory(ABC):
-    @abstractmethod
-    def get_animal(self):
-        pass
+// Dog type
+type Dog struct{}
 
-class CatFactory(AnimalFactory):
-    def get_animal(self):
-        return Cat()
+func (d *Dog) Voice() {
+	fmt.Println("Bhow Bhow!!")
+}
 
-class DogFactory(AnimalFactory):
-    def get_animal(self):
-        return Dog()
+// Cat type
+type Cat struct{}
 
-# Client Code
-d = DogFactory()
-d.get_animal().voice()
-c = CatFactory()
-c.get_animal().voice()
+func (c *Cat) Voice() {
+	fmt.Println("Meow Meow!!")
+}
 
-# loose coupeling 
-# single responsibility principle.
-# open close principle.
+// AnimalFactory interface
+type AnimalFactory interface {
+	GetAnimal() Animal
+}
 
+// CatFactory type
+type CatFactory struct{}
 
-# Future changes to include cow type of objects.
-class Cow(Animal):
-    def voice(self):
-        print("Gooaa Gooaa!!")
+func (cf *CatFactory) GetAnimal() Animal {
+	return &Cat{}
+}
 
-class CowFactory(AnimalFactory):
-    def get_animal(self):
-        return Cow()
+// DogFactory type
+type DogFactory struct{}
 
-#Client Code
-cw = CowFactory()
-cw.get_animal().voice()
+func (df *DogFactory) GetAnimal() Animal {
+	return &Dog{}
+}
+
+// Cow type
+type Cow struct{}
+
+func (c *Cow) Voice() {
+	fmt.Println("Gooaa Gooaa!!")
+}
+
+// CowFactory type
+type CowFactory struct{}
+
+func (cf *CowFactory) GetAnimal() Animal {
+	return &Cow{}
+}
+
+// Client Code
+func main() {
+	// Dog
+	dogFactory := &DogFactory{}
+	dogFactory.GetAnimal().Voice()
+
+	// Cat
+	catFactory := &CatFactory{}
+	catFactory.GetAnimal().Voice()
+
+	// Cow
+	cowFactory := &CowFactory{}
+	cowFactory.GetAnimal().Voice()
+}
+
+/*
+Bhow Bhow!!
+Meow Meow!!
+Gooaa Gooaa!!
+*/

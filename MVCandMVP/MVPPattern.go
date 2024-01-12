@@ -1,50 +1,71 @@
-# Model View Presenter
-class Model(object):
-    def __init__(self):
-        self.data = 'Hello, World!'
+package main
 
-    def set_data(self, data):
-        print("Model: Set data :", data)
-        self.data = data
+import "fmt"
 
-    def get_data(self):
-        print("Model: Get data: ", self.data)
-        return self.data
+type Model struct {
+    data string
+}
 
-class View(object):
-    def update(self, data):
-        print("View: Updating the view with data: ", data)
+func NewModel() *Model {
+    return &Model{data: "Hello, World!"}
+}
 
-class Presenter(object):
-    def __init__(self):
-        self.model = Model()
-        self.view = View()
+func (m *Model) SetData(data string) {
+    fmt.Println("Model: Set data :", data)
+    m.data = data
+}
 
-    def set_data(self, data):
-        print("Presenter: Receive data from client.")
-        self.model.set_data(data)
+func (m *Model) GetData() string {
+    fmt.Println("Model: Get data.")
+    return m.data
+}
 
-    def update_view(self):
-        print("Presenter: Receive update view from client.")
-        data = self.model.get_data()
-        self.view.update(data)
+type View struct{}
 
-# Client code
-print("Client: Pass trigger to Presenter.")
-presenter = Presenter()
-presenter.update_view()
+func (v *View) Update(data string) {
+    fmt.Println("View: Updating the view with data: ", data)
+}
 
-presenter.set_data("Hello, Students!")
-presenter.update_view()
+type Presenter struct {
+    model *Model
+    view  *View
+}
 
-"""
+func NewPresenter() *Presenter {
+    return &Presenter{
+        model: NewModel(),
+        view:  &View{},
+    }
+}
+
+func (p *Presenter) SetData(data string) {
+    fmt.Println("Presenter: Receive data from client.")
+    p.model.SetData(data)
+}
+
+func (p *Presenter) UpdateView() {
+    fmt.Println("Presenter: Receive update view from client.")
+    data := p.model.GetData()
+    p.view.Update(data)
+}
+
+func main() {
+    fmt.Println("Client: Pass trigger to Presenter.")
+    presenter := NewPresenter()
+    presenter.UpdateView()
+
+    presenter.SetData("Hello, Students!")
+    presenter.UpdateView()
+}
+
+/*
 Client: Pass trigger to Presenter.
 Presenter: Receive update view from client.
-Model: Get data:  Hello, World!
+Model: Get data.
 View: Updating the view with data:  Hello, World!
 Presenter: Receive data from client.
 Model: Set data : Hello, Students!
 Presenter: Receive update view from client.
-Model: Get data:  Hello, Students!
+Model: Get data.
 View: Updating the view with data:  Hello, Students!
-"""
+*/

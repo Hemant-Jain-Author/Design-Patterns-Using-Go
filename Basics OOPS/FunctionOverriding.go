@@ -1,26 +1,56 @@
-class Person(object):
-    def __init__(self, name, age): #constructor
-        self.name = name #data member
-    
-    def toString(self): # member function
-        return "Person: %s:%s" % (self.name, self.oath)
+package main
 
-    def setOath(self):
-        self.oath = "Always tell truth"
+import "fmt"
 
+// Person struct
+type Person struct {
+	name string
+	oath string
+}
 
-class Citizen(Person):
-    def __init__(self, name, id): #constructor
-        self.name = name
-        self.id = id
+// NewPerson constructor
+func NewPerson(name string) *Person {
+	return &Person{name: name}
+}
 
-    def setOath(self):
-        self.oath = "Country comes first"
-    
-p = Person("John", 32) # p is an object of type Person
-p.setOath()
-print(p.toString())
+// SetOath method for Person
+func (p *Person) SetOath() {
+	p.oath = "Always tell the truth"
+}
 
-c = Citizen("Smith", 31)
-c.setOath()
-print(c.toString())
+// ToString method for Person
+func (p *Person) ToString() string {
+	return fmt.Sprintf("Person: %s:%s", p.name, p.oath)
+}
+
+// Citizen struct
+type Citizen struct {
+	Person
+	id int
+}
+
+// NewCitizen constructor
+func NewCitizen(name string, id int) *Citizen {
+	return &Citizen{Person: Person{name: name}, id: id}
+}
+
+// SetOath method for Citizen
+func (c *Citizen) SetOath() {
+	c.oath = "Country comes first"
+}
+
+// Client Code
+func main() {
+	p := NewPerson("John") // p is an object of type Person
+	p.SetOath()
+	fmt.Println(p.ToString())
+
+	c := NewCitizen("Smith", 31)
+	c.SetOath()
+	fmt.Println(c.ToString())
+}
+
+/*
+Person: John:Always tell the truth
+Person: Smith:Country comes first
+*/

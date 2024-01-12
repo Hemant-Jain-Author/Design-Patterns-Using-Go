@@ -1,52 +1,67 @@
-from abc import ABC, abstractmethod
-import math
+package main
 
-class Color(ABC):
-    def __init__(self, color='black'):
-        self.__color = color
- 
-    def getColor(self):
-        return self.__color
- 
-    def setColor(self, color):
-        self.__color = color
+import (
+	"fmt"
+)
 
-class Shape(ABC):
-    @abstractmethod
-    def area(self):
-        pass
+// Color struct
+type Color struct {
+	color string
+}
 
-    @abstractmethod
-    def perimeter(self):
-        pass    
- 
+// NewColor constructor
+func NewColor(color string) *Color {
+	return &Color{color: color}
+}
 
-class Rectangle(Shape, Color):
-    def __init__(self, length, breadth, color):
-        Color.__init__(self, color)
-        Shape.__init__(self)
-        self.__length = length
-        self.__breadth = breadth
- 
-    def getLength(self):
-        return self.__length
- 
-    def setLength(self, length):
-        self.__length = length
- 
-    def getBreadth(self):
-        return self.__breadth
- 
-    def setBreadth(self, breadth):
-        self.__breadth = breadth
- 
-    def area(self):
-        return self.__length * self.__breadth
- 
-    def perimeter(self):
-        return 2 * (self.__length + self.__breadth)
+// GetColor method for Color
+func (c *Color) GetColor() string {
+	return c.color
+}
 
-r = Rectangle(10, 20, 'red')
-print(r.area(), r.perimeter(), r.getColor())
-r.setColor('white')
-print(r.area(), r.perimeter(), r.getColor())
+// SetColor method for Color
+func (c *Color) SetColor(color string) {
+	c.color = color
+}
+
+// Shape interface
+type Shape interface {
+	Area() float64
+	Perimeter() float64
+}
+
+// Rectangle struct
+type Rectangle struct {
+	Color
+	length  float64
+	breadth float64
+}
+
+// NewRectangle constructor
+func NewRectangle(length, breadth float64, color string) *Rectangle {
+	return &Rectangle{Color: *NewColor(color), length: length, breadth: breadth}
+}
+
+// Area method for Rectangle
+func (r *Rectangle) Area() float64 {
+	return r.length * r.breadth
+}
+
+// Perimeter method for Rectangle
+func (r *Rectangle) Perimeter() float64 {
+	return 2 * (r.length + r.breadth)
+}
+
+// Client Code
+func main() {
+	r := NewRectangle(10, 20, "red")
+	fmt.Printf("Area: %.2f, Perimeter: %.2f, Color: %s\n", r.Area(), r.Perimeter(), r.GetColor())
+
+	r.SetColor("white")
+	fmt.Printf("Area: %.2f, Perimeter: %.2f, Color: %s\n", r.Area(), r.Perimeter(), r.GetColor())
+}
+
+/*
+Area: 200.00, Perimeter: 60.00, Color: red
+Area: 200.00, Perimeter: 60.00, Color: white
+*/

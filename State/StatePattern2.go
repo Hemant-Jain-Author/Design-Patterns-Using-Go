@@ -1,41 +1,51 @@
-from abc import ABC, abstractmethod
-import math
+package main
 
-class Context:
-    def __init__(self, state):
-        self.current_state = state
+import "fmt"
 
-    def change_state(self, state):
-        self.current_state = state
-    
-    def request(self):
-        self.current_state.handle(self)
+type Context struct {
+	currentState State
+}
 
+func NewContext(state State) *Context {
+	return &Context{
+		currentState: state,
+	}
+}
 
-class State(ABC):
-    @abstractmethod
-    def handle(self, context):
-        pass
+func (c *Context) changeState(state State) {
+	c.currentState = state
+}
 
+func (c *Context) request() {
+	c.currentState.handle(c)
+}
 
-class ConcreteState1(State):
-    def handle(self, context):
-        print("ConcreteState1 handle")
-        context.change_state(ConcreteState2())
+type State interface {
+	handle(context *Context)
+}
 
+type ConcreteState1 struct{}
 
-class ConcreteState2(State):
-    def handle(self, context):
-        print("ConcreteState2 handle")
-        context.change_state(ConcreteState1())
+func (cs1 *ConcreteState1) handle(context *Context) {
+	fmt.Println("ConcreteState1 handle")
+	context.changeState(&ConcreteState2{})
+}
 
-# Client code.
-state1 = ConcreteState1()
-context = Context(state1)
-context.request()
-context.request()
+type ConcreteState2 struct{}
 
-"""
+func (cs2 *ConcreteState2) handle(context *Context) {
+	fmt.Println("ConcreteState2 handle")
+	context.changeState(&ConcreteState1{})
+}
+
+func main() {
+	state1 := &ConcreteState1{}
+	context := NewContext(state1)
+	context.request()
+	context.request()
+}
+
+/*
 ConcreteState1 handle
 ConcreteState2 handle
-"""
+*/

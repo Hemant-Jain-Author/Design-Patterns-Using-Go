@@ -1,34 +1,73 @@
-from abc import ABC, abstractmethod
+package main
 
-class OrderPackingTemplate(ABC):
-    
-    def pack_product(self): # Final
-        self.get_product()
-        self.add_product_tobox()
-        self.delivery()
+import "fmt"
 
-    def get_product(self):
-        print("Get the product form shelf.")
+// OrderPackingTemplate is the abstract class defining the template method.
+type OrderPackingTemplate interface {
+	packProduct()
+	getProduct()
+	addProductToBox()
+	delivery()
+}
 
-    def add_product_tobox(self):
-        print("Put the product inside Box.")
-    
-    @abstractmethod
-    def delivery(self):
-        pass
+// OnlineOrderPacking is a concrete implementation of OrderPackingTemplate for online orders.
+type OnlineOrderPacking struct{}
 
+func (o *OnlineOrderPacking) packProduct() {
+	o.getProduct()
+	o.addProductToBox()
+	o.delivery()
+}
 
-class OnlineOrderPacking(OrderPackingTemplate):
-    def delivery(self):
-        print("Add delivery address slip and ship.")
+func (o *OnlineOrderPacking) getProduct() {
+	fmt.Println("Get the product from the shelf.")
+}
 
-class StoreOrderPacking(OrderPackingTemplate):
-    def delivery(self):
-        print("Add thanks message to box and deliver to customer.")
-  
-# Client code. 
-o = OnlineOrderPacking()
-o.pack_product()
-print()
-s = StoreOrderPacking()
-s.pack_product()
+func (o *OnlineOrderPacking) addProductToBox() {
+	fmt.Println("Put the product inside the box.")
+}
+
+func (o *OnlineOrderPacking) delivery() {
+	fmt.Println("Add delivery address slip and ship.")
+}
+
+// StoreOrderPacking is another concrete implementation of OrderPackingTemplate for store orders.
+type StoreOrderPacking struct{}
+
+func (s *StoreOrderPacking) packProduct() {
+	s.getProduct()
+	s.addProductToBox()
+	s.delivery()
+}
+
+func (s *StoreOrderPacking) getProduct() {
+	fmt.Println("Get the product from the shelf.")
+}
+
+func (s *StoreOrderPacking) addProductToBox() {
+	fmt.Println("Put the product inside the box.")
+}
+
+func (s *StoreOrderPacking) delivery() {
+	fmt.Println("Add thanks message to the box and deliver to the customer.")
+}
+
+func main() {
+	// Client Code
+	o := &OnlineOrderPacking{}
+	o.packProduct()
+	fmt.Println()
+
+	s := &StoreOrderPacking{}
+	s.packProduct()
+}
+
+/*
+Get the product from the shelf.
+Put the product inside the box.
+Add delivery address slip and ship.
+
+Get the product from the shelf.
+Put the product inside the box.
+Add thanks message to the box and deliver to the customer.
+*/

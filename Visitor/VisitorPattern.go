@@ -1,51 +1,66 @@
-from abc import ABC, abstractmethod
+package main
 
-class Element(ABC):
-    @abstractmethod
-    def accept(self, visitor):
-        pass
+import "fmt"
 
-class ConcreteElementA(Element):
-    def accept(self, visitor):
-        visitor.visit_elementA(self)
+// Element is the abstract class defining the accept method.
+type Element interface {
+	accept(visitor Visitor)
+}
 
-class ConcreteElementB(Element):
-    def accept(self, visitor):
-        visitor.visit_elementB(self)
+// ConcreteElementA is a concrete implementation of Element for element A.
+type ConcreteElementA struct{}
 
-class Visitor(ABC):
-    @abstractmethod
-    def visit_elementA(self, elementA):
-        pass
+func (e *ConcreteElementA) accept(visitor Visitor) {
+	visitor.visitElementA(e)
+}
 
-    @abstractmethod
-    def visit_elementB(self, elementB):
-        pass
+// ConcreteElementB is another concrete implementation of Element for element B.
+type ConcreteElementB struct{}
 
-class ConcreteVisitor1(Visitor):
-    def visit_elementA(self, elementA):
-        print("ConcreteVisitor1 visit_elementA() method called.")
+func (e *ConcreteElementB) accept(visitor Visitor) {
+	visitor.visitElementB(e)
+}
 
-    def visit_elementB(self, elementB):
-        print("ConcreteVisitor1 visit_elementB() method called.")
+// Visitor is the abstract class defining the visit methods.
+type Visitor interface {
+	visitElementA(elementA *ConcreteElementA)
+	visitElementB(elementB *ConcreteElementB)
+}
 
-class ConcreteVisitor2(Visitor):
-    def visit_elementA(self, elementA):
-        print("ConcreteVisitor2 visit_elementA() method called.")
+// ConcreteVisitor1 is a concrete implementation of Visitor.
+type ConcreteVisitor1 struct{}
 
-    def visit_elementB(self, elementB):
-        print("ConcreteVisitor2 visit_elementB() method called.")
+func (v *ConcreteVisitor1) visitElementA(elementA *ConcreteElementA) {
+	fmt.Println("ConcreteVisitor1 visitElementA() method called.")
+}
 
+func (v *ConcreteVisitor1) visitElementB(elementB *ConcreteElementB) {
+	fmt.Println("ConcreteVisitor1 visitElementB() method called.")
+}
 
-# Client Code.
-visitor1 = ConcreteVisitor1()
-elementA = ConcreteElementA()
-elementA.accept(visitor1)
+// ConcreteVisitor2 is another concrete implementation of Visitor.
+type ConcreteVisitor2 struct{}
 
-elementA = ConcreteElementB()
-elementA.accept(visitor1)
+func (v *ConcreteVisitor2) visitElementA(elementA *ConcreteElementA) {
+	fmt.Println("ConcreteVisitor2 visitElementA() method called.")
+}
 
-"""
-ConcreteVisitor1 visit_elementA() method called.
-ConcreteVisitor1 visit_elementB() method called.
-"""
+func (v *ConcreteVisitor2) visitElementB(elementB *ConcreteElementB) {
+	fmt.Println("ConcreteVisitor2 visitElementB() method called.")
+}
+
+func main() {
+	// Client Code
+	visitor1 := &ConcreteVisitor1{}
+
+	elementA := &ConcreteElementA{}
+	elementA.accept(visitor1)
+
+	elementB := &ConcreteElementB{}
+	elementB.accept(visitor1)
+}
+
+/*
+ConcreteVisitor1 visitElementA() method called.
+ConcreteVisitor1 visitElementB() method called.
+*/

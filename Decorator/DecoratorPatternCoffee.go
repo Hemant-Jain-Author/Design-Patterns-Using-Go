@@ -1,63 +1,85 @@
-from abc import ABC, abstractmethod
+package main
 
-class Coffee (ABC):
-    @abstractmethod
-    def get_cost(self):
-        pass
-    
-    @abstractmethod
-    def get_ingredients(self):
-        pass
+import "fmt"
 
-class SimpleCoffee(Coffee):
-    def get_cost(self):
-        return 10
+// Coffee is the interface for coffee
+type Coffee interface {
+	GetCost() int
+	GetIngredients() string
+}
 
-    def get_ingredients(self):
-        return "Coffee"
+// SimpleCoffee is a simple concrete implementation of Coffee
+type SimpleCoffee struct{}
 
-class CoffeeDecorator(Coffee):
-    def __init__(self, component):
-        self._component = component
+// GetCost implements the GetCost method for SimpleCoffee
+func (c *SimpleCoffee) GetCost() int {
+	return 10
+}
 
-    @abstractmethod
-    def get_cost(self):
-        pass
+// GetIngredients implements the GetIngredients method for SimpleCoffee
+func (c *SimpleCoffee) GetIngredients() string {
+	return "Coffee"
+}
 
-    @abstractmethod
-    def get_ingredients(self):
-        pass
+// CoffeeDecorator is the interface for coffee decorators
+type CoffeeDecorator interface {
+	Coffee
+}
 
-class MilkDecorator(CoffeeDecorator):
-    def get_cost(self):
-        return self._component.get_cost() + 4
+// BaseCoffeeDecorator provides default implementation for the CoffeeDecorator interface
+type BaseCoffeeDecorator struct {
+	component Coffee
+}
 
-    def get_ingredients(self):
-        return self._component.get_ingredients() +", Milk"
+// GetCost implements the GetCost method for BaseCoffeeDecorator
+func (d *BaseCoffeeDecorator) GetCost() int {
+	return d.component.GetCost()
+}
 
-class EspressoDecorator (CoffeeDecorator):
-    def get_cost(self):
-        return self._component.get_cost() + 5
+// GetIngredients implements the GetIngredients method for BaseCoffeeDecorator
+func (d *BaseCoffeeDecorator) GetIngredients() string {
+	return d.component.GetIngredients()
+}
 
-    def get_ingredients(self):
-        return self._component.get_ingredients() +", Espresso "
+// MilkDecorator is a concrete decorator for adding milk to coffee
+type MilkDecorator struct {
+	BaseCoffeeDecorator
+}
 
-# Client code
-component = SimpleCoffee()
-decorator1 = MilkDecorator(component)
-decorator2 = EspressoDecorator(decorator1)
-print("Coffee cost is :: %s" %decorator2.get_cost())
-print("Coffee ingredients are :: %s" %decorator2.get_ingredients())
+// GetCost implements the GetCost method for MilkDecorator
+func (d *MilkDecorator) GetCost() int {
+	return d.component.GetCost() + 4
+}
 
+// GetIngredients implements the GetIngredients method for MilkDecorator
+func (d *MilkDecorator) GetIngredients() string {
+	return d.component.GetIngredients() + ", Milk"
+}
 
-latte = MilkDecorator(MilkDecorator(SimpleCoffee()))
-print("Coffee cost is :: %s" %latte.get_cost())
-print("Coffee ingredients are :: %s" %latte.get_ingredients())
+// EspressoDecorator is a concrete decorator for adding espresso to coffee
+type EspressoDecorator struct {
+	BaseCoffeeDecorator
+}
 
-"""
-Coffee cost is :: 19
-Coffee ingredients are :: Coffee, Milk, Espresso 
-Coffee cost is :: 18
-Coffee ingredients are :: Coffee, Milk, Milk
+// GetCost implements the GetCost method for EspressoDecorator
+func (d *EspressoDecorator) GetCost() int {
+	return d.component.GetCost() + 5
+}
 
-"""
+// GetIngredients implements the GetIngredients method for EspressoDecorator
+func (d *EspressoDecorator) GetIngredients() string {
+	return d.component.GetIngredients() + ", Espresso"
+}
+
+func main() {
+	component := &SimpleCoffee{}
+	decorator1 := &MilkDecorator{BaseCoffeeDecorator{component}}
+	decorator2 := &EspressoDecorator{BaseCoffeeDecorator{decorator1}}
+
+	fmt.Printf("Coffee cost is :: %d\n", decorator2.GetCost())
+	fmt.Printf("Coffee ingredients are :: %s\n", decorator2.GetIngredients())
+
+	latte := &MilkDecorator{BaseCoffeeDecorator{&MilkDecorator{BaseCoffeeDecorator{&SimpleCoffee{}}}}}
+	fmt.Printf("Coffee cost is :: %d\n", latte.GetCost())
+	fmt.Printf("Coffee ingredients are :: %s\n", latte.GetIngredients())
+}

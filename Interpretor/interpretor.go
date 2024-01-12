@@ -1,64 +1,104 @@
-from abc import ABC, abstractmethod
+package main
 
-class Expression(ABC):
-    @abstractmethod
-    def interpret(self):
-        pass
+import (
+	"fmt"
+	"strconv"
+	"strings"
+)
 
-class Number(Expression):
-    def __init__(self, value):
-        self.value = value
-    
-    def interpret(self):
-        return self.value
+// Expression interface
+type Expression interface {
+	Interpret() int
+}
 
-class Plus(Expression):
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-    
-    def interpret(self):
-        return self.left.interpret() + self.right.interpret()
+// Number type
+type Number struct {
+	value int
+}
 
-class Minus(Expression):
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-    
-    def interpret(self):
-        return self.left.interpret() - self.right.interpret()
+func NewNumber(value int) *Number {
+	return &Number{value: value}
+}
 
-class Context:
-    def __init__(self):
-        self.variables = {}
-    
-    def get_value(self, name):
-        return self.variables.get(name, 0)
-    
-    def set_value(self, name, value):
-        self.variables[name] = value
+func (n *Number) Interpret() int {
+	return n.value
+}
 
-def parse_expression(expression, context):
-    if expression.isdigit():
-        return Number(int(expression))
-    elif "+" in expression:
-        left, right = expression.split(" + ", 1)
-        return Plus(parse_expression(left, context), parse_expression(right, context))
-    elif "-" in expression:
-        left, right = expression.split(" - ", 1)
-        return Minus(parse_expression(left, context), parse_expression(right, context))
-    else:
-        return Number(int(context.get_value(expression)))
+// Plus type
+type Plus struct {
+	left  Expression
+	right Expression
+}
 
-# Client code.
-context = Context()
-context.set_value("x", 10)
-context.set_value("y", 5)
+func NewPlus(left, right Expression) *Plus {
+	return &Plus{left: left, right: right}
+}
 
-expression = parse_expression("x + y + 2", context)
-result = expression.interpret()
-print(result)
+func (p *Plus) Interpret() int {
+	return p.left.Interpret() + p.right.Interpret()
+}
 
-"""
+// Minus type
+type Minus struct {
+	left  Expression
+	right Expression
+}
+
+func NewMinus(left, right Expression) *Minus {
+	return &Minus{left: left, right: right}
+}
+
+func (m *Minus) Interpret() int {
+	return m.left.Interpret() - m.right.Interpret()
+}
+
+// Context type
+type Context struct {
+	variables map[string]int
+}
+
+func NewContext() *Context {
+	return &Context{
+		variables: make(map[string]int),
+	}
+}
+
+func (c *Context) GetValue(name string) int {
+	return c.variables[name]
+}
+
+func (c *Context) SetValue(name string, value int) {
+	c.variables[name] = value
+}
+
+func ParseExpression(expression string, context *Context) Expression {
+	if strings.Contains(expression, "+") {
+		split := strings.SplitN(expression, " + ", 2)
+		left := ParseExpression(split[0], context)
+		right := ParseExpression(split[1], context)
+		return NewPlus(left, right)
+	} else if strings.Contains(expression, "-") {
+		split := strings.SplitN(expression, " - ", 2)
+		left := ParseExpression(split[0], context)
+		right := ParseExpression(split[1], context)
+		return NewMinus(left, right)
+	} else if val, err := strconv.Atoi(expression); err == nil {
+		return NewNumber(val)
+	} else {
+		return NewNumber(context.GetValue(expression))
+	}
+}
+
+func main() {
+	context := NewContext()
+	context.SetValue("x", 10)
+	context.SetValue("y", 5)
+
+	expression := ParseExpression("x + y + 2", context)
+    result := expression.Interpret()
+	fmt.Println(result)
+}
+
+/*
 17
-"""
+*/

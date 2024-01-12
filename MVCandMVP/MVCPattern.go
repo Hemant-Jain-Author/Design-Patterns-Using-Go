@@ -1,53 +1,74 @@
-class Model(object):
-    def __init__(self):
-        self.data = 'Hello, World!'
+package main
 
-    def set_data(self, data):
-        print("Model: Set data :", data)
-        self.data = data
+import "fmt"
 
-    def get_data(self):
-        print("Model: Get data: ", self.data)
-        return self.data
+type Model struct {
+    data string
+}
 
-class View(object):
-    # Dummy view which is print some data to standard output.
-    # View is supposed to intaract the UI. 
-    def __init__(self, model):
-        self.model = model
+func NewModel() *Model {
+    return &Model{data: "Hello, World!"}
+}
 
-    # In classic MVC view interact with the model to get data.
-    def update(self):
-        data = self.model.get_data()
-        print("View: Updating the view with data : ", data)
+func (m *Model) SetData(data string) {
+    fmt.Println("Model: Set data:", data)
+    m.data = data
+}
 
-class Controller(object):
-    def __init__(self):
-        self.model = Model()
-        self.view = View(self.model)
+func (m *Model) GetData() string {
+    fmt.Println("Model: Get data:", m.data)
+    return m.data
+}
 
-    def set_data(self, data):
-        print("Controller: Receive data from client.")
-        self.model.set_data(data)
+type View struct {
+    model *Model
+}
 
-    def update_view(self):
-        print("Controller: Receive update view from client.")
-        self.view.update()
+func NewView(model *Model) *View {
+    return &View{model: model}
+}
 
-# Client code
-controller = Controller()
-controller.update_view()
+func (v *View) Update() {
+    data := v.model.GetData()
+    fmt.Println("View: Updating the view with data:", data)
+}
 
-controller.set_data("Hello, Students!")
-controller.update_view()
+type Controller struct {
+    model *Model
+    view  *View
+}
 
-"""
+func NewController() *Controller {
+    model := NewModel()
+    view := NewView(model)
+    return &Controller{model: model, view: view}
+}
+
+func (c *Controller) SetData(data string) {
+    fmt.Println("Controller: Receive data from client.")
+    c.model.SetData(data)
+}
+
+func (c *Controller) UpdateView() {
+    fmt.Println("Controller: Receive update view from client.")
+    c.view.Update()
+}
+
+func main() {
+    controller := NewController()
+    controller.UpdateView()
+
+    controller.SetData("Hello, Students!")
+    controller.UpdateView()
+}
+
+/*
 Controller: Receive update view from client.
-Model: Get data:  Hello, World!
-View: Updating the view with data :  Hello, World!
+Model: Get data: Hello, World!
+View: Updating the view with data: Hello, World!
 Controller: Receive data from client.
-Model: Set data : Hello, Students!
+Model: Set data: Hello, Students!
 Controller: Receive update view from client.
-Model: Get data:  Hello, Students!
-View: Updating the view with data :  Hello, Students!
-"""
+Model: Get data: Hello, Students!
+View: Updating the view with data: Hello, Students!
+*/

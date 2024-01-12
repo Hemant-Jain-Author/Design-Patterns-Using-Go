@@ -1,21 +1,48 @@
-class Tyre(object):
-    def __init__(self, type):   #constructor
-        self.type= type         #data members / attributes
-    
-    def get_type(self):          # member function
-        return self.type
+package main
 
+import "fmt"
 
-class Car(object):
-    def __init__(self, model): #constructor
-        self.model = model
-        self.tyres = []
-        for i in range(4):
-            self.tyres.append(Tyre("MRF"))
+// Tyre struct
+type Tyre struct {
+	tireType string
+}
 
-    def display(self):
-        print("Car: %s, Tyre : %s" % (self.model, self.tyres[0].get_type())) 
+// NewTyre constructor
+func NewTyre(tireType string) *Tyre {
+	return &Tyre{tireType: tireType}
+}
 
-# Client code
-c = Car("BMW")
-c.display()
+// GetType method for Tyre
+func (t *Tyre) GetType() string {
+	return t.tireType
+}
+
+// Car struct
+type Car struct {
+	model string
+	tyres []*Tyre
+}
+
+// NewCar constructor
+func NewCar(model string) *Car {
+	c := &Car{model: model, tyres: make([]*Tyre, 4)}
+	for i := 0; i < 4; i++ {
+		c.tyres[i] = NewTyre("MRF")
+	}
+	return c
+}
+
+// Display method for Car
+func (c *Car) Display() {
+	fmt.Printf("Car: %s, Tyre: %s\n", c.model, c.tyres[0].GetType())
+}
+
+// Client Code
+func main() {
+	c := NewCar("BMW")
+	c.Display()
+}
+
+/*
+Car: BMW, Tyre: MRF
+*/

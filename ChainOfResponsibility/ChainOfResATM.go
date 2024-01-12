@@ -1,32 +1,59 @@
-from abc import ABC, abstractmethod
+package main
 
-class ATMHandlerAbstract(ABC):
-    def __init__(self, successor, denomination):
-        self._successor = successor
-        self._denomination = denomination
+import "fmt"
 
-    @abstractmethod
-    def handle_request(self, amount):
-        pass
+// ATMHandler interface
+type ATMHandler interface {
+	handleRequest(amount int)
+}
 
-class ATMHandler(ATMHandlerAbstract):
-    def handle_request(self, amount):
-        q = int(amount // self._denomination)
-        r = amount % self._denomination
-        if q != 0:
-            print("%s notes of %s"%(q,self._denomination))
+// ATMHandlerConcrete struct
+type ATMHandlerConcrete struct {
+	successor     ATMHandler
+	denomination  int
+}
 
-        if r != 0 and self._successor is not None:
-            self._successor.handle_request(r)
+// NewATMHandlerConcrete constructor
+func NewATMHandlerConcrete(successor ATMHandler, denomination int) *ATMHandlerConcrete {
+	return &ATMHandlerConcrete{
+		successor:    successor,
+		denomination: denomination,
+	}
+}
 
+// handleRequest method for ATMHandlerConcrete
+func (ahc *ATMHandlerConcrete) handleRequest(amount int) {
+	q := amount / ahc.denomination
+	r := amount % ahc.denomination
 
-# Client Code
-ch = ATMHandler(ATMHandler(ATMHandler(ATMHandler(None, 10), 50), 100), 1000)
-ch.handle_request(5560)
+	if q != 0 {
+		fmt.Printf("%d notes of %d\n", q, ahc.denomination)
+	}
 
-"""
+	if r != 0 && ahc.successor != nil {
+		ahc.successor.handleRequest(r)
+	}
+}
+
+func main() {
+	// Client code.
+	ch := NewATMHandlerConcrete(
+		NewATMHandlerConcrete(
+			NewATMHandlerConcrete(
+				NewATMHandlerConcrete(nil, 10),
+				50,
+			),
+			100,
+		),
+		1000,
+	)
+
+	ch.handleRequest(5560)
+}
+
+/*
 5 notes of 1000
 5 notes of 100
 1 notes of 50
 1 notes of 10
-"""
+*/

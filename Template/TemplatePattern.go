@@ -1,38 +1,53 @@
-from abc import ABC, abstractmethod
+package main
 
-class AbstractClass(ABC):
-    def template_method(self):   # Final method
-        self.operation1()
-        self.operation2()
+import "fmt"
 
-    @abstractmethod
-    def operation1(self):
-        pass
+// AbstractClass is the abstract class defining the template method.
+type AbstractClass interface {
+	templateMethod()
+	operation1()
+	operation2()
+}
 
-    @abstractmethod
-    def operation2(self):
-        pass
+// ConcreteClass1 is a concrete implementation of AbstractClass.
+type ConcreteClass1 struct{}
 
-class ConcreteClass1(AbstractClass):
-    def operation1(self):
-        print("Concrete Class 1 : Operation 1")
+func (c *ConcreteClass1) templateMethod() {
+	c.operation1()
+	c.operation2()
+}
 
-    def operation2(self):
-        print("Concrete Class 1 : Operation 2")
+func (c *ConcreteClass1) operation1() {
+	fmt.Println("Concrete Class 1 : Operation 1")
+}
 
-class ConcreteClass2(AbstractClass):
-    def operation1(self):
-        print("Concrete Class 2 : Operation 1")
+func (c *ConcreteClass1) operation2() {
+	fmt.Println("Concrete Class 1 : Operation 2")
+}
 
-    def operation2(self):
-        print("Concrete Class 2 : Operation 2")
+// ConcreteClass2 is another concrete implementation of AbstractClass.
+type ConcreteClass2 struct{}
 
+func (c *ConcreteClass2) templateMethod() {
+	c.operation1()
+	c.operation2()
+}
 
-# Client Code
-concrete_class = ConcreteClass1()
-concrete_class.template_method()
+func (c *ConcreteClass2) operation1() {
+	fmt.Println("Concrete Class 2 : Operation 1")
+}
 
-"""
+func (c *ConcreteClass2) operation2() {
+	fmt.Println("Concrete Class 2 : Operation 2")
+}
+
+func main() {
+	// Client Code
+	concreteClass := &ConcreteClass1{}
+	concreteClass.templateMethod()
+}
+
+/*
 Concrete Class 1 : Operation 1
 Concrete Class 1 : Operation 2
-"""
+*/

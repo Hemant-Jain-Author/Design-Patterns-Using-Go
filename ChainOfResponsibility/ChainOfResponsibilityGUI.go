@@ -1,62 +1,114 @@
-from abc import ABC, abstractmethod
+package main
 
-class Handler(ABC):
-    def __init__(self, parent=None):
-        self._parent = parent
-        self._helpText = None
+import "fmt"
 
-    @abstractmethod
-    def show_helper_text(self):
-        pass
+// Handler interface
+type Handler interface {
+	showHelperText()
+	setHelperText(text string)
+}
 
-    def set_helper_text(self, text):
-        self._helpText = text
+// Container struct
+type Container struct {
+	parent   Handler
+	helpText string
+}
 
+// NewContainer constructor
+func NewContainer(parent Handler) *Container {
+	return &Container{
+		parent: parent,
+	}
+}
 
+// showHelperText method for Container
+func (c *Container) showHelperText() {
+	if c.helpText != "" {
+		fmt.Println("Help ::", c.helpText)
+	} else if c.parent != nil {
+		fmt.Println("Message passed to next in chain by Container")
+		c.parent.showHelperText()
+	}
+}
 
-class Container(Handler):
-    def show_helper_text(self):
-        if self._helpText is not None:  # Can handle request.
-            print("Help :: ", self._helpText)
-        elif self._parent is not None:
-            print("Message passed to next in chain by Container")
-            self._parent.show_helper_text()
+// setHelperText method for Container
+func (c *Container) setHelperText(text string) {
+	c.helpText = text
+}
 
+// Button struct
+type Button struct {
+	parent   Handler
+	label    string
+	helpText string
+}
 
+// NewButton constructor
+func NewButton(label string, parent Handler) *Button {
+	return &Button{
+		parent: parent,
+		label:  label,
+	}
+}
 
-class Button(Handler):
-    def __init__(self, label, parent=None ):
-        super(Button, self).__init__(parent)
-        self._label = label
+// showHelperText method for Button
+func (b *Button) showHelperText() {
+	if b.helpText != "" {
+		fmt.Println("Help ::", b.helpText)
+	} else if b.parent != nil {
+		fmt.Println("Message passed to next in chain by Button")
+		b.parent.showHelperText()
+	}
+}
 
-    def show_helper_text(self):
-        if self._helpText is not None:  # Can handle request.
-            print("Help :: ", self._helpText)
-        elif self._parent is not None:
-            print("Message passed to next in chain by Button")
-            self._parent.show_helper_text()
+// setHelperText method for Button
+func (b *Button) setHelperText(text string) {
+	b.helpText = text
+}
 
+// Panel struct
+type Panel struct {
+	parent   Handler
+	helpText string
+}
 
-class Panel(Handler):
-    def show_helper_text(self):
-        if self._helpText is not None:  # Can handle request.
-            print("Help :: ", self._helpText)
-        elif self._parent is not None:
-            print("Message passed to next in chain by Panel")
-            self._parent.show_helper_text()
+// NewPanel constructor
+func NewPanel(parent Handler) *Panel {
+	return &Panel{
+		parent: parent,
+	}
+}
 
+// showHelperText method for Panel
+func (p *Panel) showHelperText() {
+	if p.helpText != "" {
+		fmt.Println("Help ::", p.helpText)
+	} else if p.parent != nil {
+		fmt.Println("Message passed to next in chain by Panel")
+		p.parent.showHelperText()
+	}
+}
 
-# Client Code
-p = Panel()
-p.set_helper_text("Panel help text.")
-b1 = Button("Ok", p)
-b1.set_helper_text("Ok button help text.")
-b2 = Button("Cancel", p)
-b1.show_helper_text()
-b2.show_helper_text()
+// setHelperText method for Panel
+func (p *Panel) setHelperText(text string) {
+	p.helpText = text
+}
 
-"""
-Help ::  Ok button help text.
+func main() {
+	// Client code.
+	p := NewPanel(nil)
+	p.setHelperText("Panel help text.")
+
+	b1 := NewButton("Ok", p)
+	b1.setHelperText("Ok button help text.")
+	b2 := NewButton("Cancel", p)
+
+	b1.showHelperText()
+	b2.showHelperText()
+}
+
+/*
+Help :: Ok button help text.
 Message passed to next in chain by Button
-Help ::  Panel help text.
-"""
+Help :: Panel help text.
+*/

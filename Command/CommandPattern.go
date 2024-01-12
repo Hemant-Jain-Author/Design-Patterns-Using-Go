@@ -1,57 +1,79 @@
-from abc import ABC, abstractmethod
+package main
 
-class Invoker:  # Remote
-    def __init__(self):
-        self._commands = []
+import "fmt"
 
-    def set_command(self, command):
-        self._commands.append(command)
+// Command interface
+type Command interface {
+	execute()
+	unexecute()
+}
 
-    def execute_commands(self):
-        for command in self._commands:
-            command.execute()
-    
-    def unexecute_commands(self):
-        for command in self._commands:
-            command.unexecute()
-        
+// Invoker struct
+type Invoker struct {
+	commands []Command
+}
 
-class Command(ABC): 
-    @abstractmethod
-    def execute(self):
-        pass
-    
-    @abstractmethod
-    def unexecute(self):
-        pass
+// setCommand method for Invoker
+func (i *Invoker) setCommand(command Command) {
+	i.commands = append(i.commands, command)
+}
 
+// executeCommands method for Invoker
+func (i *Invoker) executeCommands() {
+	for _, command := range i.commands {
+		command.execute()
+	}
+}
 
-class ConcreteCommand(Command):
-    def __init__(self, receiver):
-        self._receiver = receiver
+// unexecuteCommands method for Invoker
+func (i *Invoker) unexecuteCommands() {
+	for _, command := range i.commands {
+		command.unexecute()
+	}
+}
 
-    def execute(self):
-        self._receiver.action("Action 1")
+// ConcreteCommand struct
+type ConcreteCommand struct {
+	receiver Receiver
+}
 
-    def unexecute(self):
-        self._receiver.action("Action 2")
+// NewConcreteCommand constructor
+func NewConcreteCommand(receiver Receiver) *ConcreteCommand {
+	return &ConcreteCommand{
+		receiver: receiver,
+	}
+}
 
+// execute method for ConcreteCommand
+func (c *ConcreteCommand) execute() {
+	c.receiver.action("Action 1")
+}
 
-class Receiver: 
-    def action(self, action):
-        print(action)
+// unexecute method for ConcreteCommand
+func (c *ConcreteCommand) unexecute() {
+	c.receiver.action("Action 2")
+}
 
+// Receiver struct
+type Receiver struct{}
 
-#Client Code.
-receiver = Receiver()
-concrete_command = ConcreteCommand(receiver)
-invoker = Invoker()
-invoker.set_command(concrete_command)
-invoker.execute_commands()
-invoker.unexecute_commands()
+// action method for Receiver
+func (r *Receiver) action(action string) {
+	fmt.Println(action)
+}
 
+func main() {
+	// Client code.
+	receiver := &Receiver{}
+	concreteCommand := NewConcreteCommand(*receiver)
+	invoker := &Invoker{}
+	invoker.setCommand(concreteCommand)
+	invoker.executeCommands()
+	invoker.unexecuteCommands()
+}
 
-"""
+/*
 Action 1
 Action 2
-"""
+*/
+

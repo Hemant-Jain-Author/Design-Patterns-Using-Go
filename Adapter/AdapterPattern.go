@@ -1,26 +1,34 @@
-from abc import ABC, abstractmethod
+package main
 
-class DesiredInterface(ABC):
-    @abstractmethod
-    def operation(self):
-        pass
+import "fmt"
 
-class Adapter(DesiredInterface):
-    def __init__(self):
-        self._adaptee = Adaptee()
-        
-    def operation(self):
-        self._adaptee.some_operation()
+// DesiredInterface interface
+type DesiredInterface interface {
+	Operation()
+}
 
-class Adaptee:
-    def some_operation(self):
-        print("Adaptee some_operation() function called.")
+// Adapter struct
+type Adapter struct {
+	adaptee *Adaptee
+}
 
+func (a *Adapter) Operation() {
+	a.adaptee.SomeOperation()
+}
 
-# Client Code
-adapter = Adapter()
-adapter.operation()
+// Adaptee struct
+type Adaptee struct{}
 
-"""
+func (a *Adaptee) SomeOperation() {
+	fmt.Println("Adaptee some_operation() function called.")
+}
+
+// Client Code
+func main() {
+	adapter := Adapter{adaptee: &Adaptee{}}
+	adapter.Operation()
+}
+
+/*
 Adaptee some_operation() function called.
-"""
+*/

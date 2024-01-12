@@ -1,59 +1,77 @@
+package main
 
-from abc import ABC, abstractmethod
-import copy
+import (
+	"fmt"
+	"reflect"
+)
 
-class Prototype(ABC):
-    def __init__(self):
-        pass
+type Prototype interface {
+	Clone() Prototype
+}
 
-    @abstractmethod
-    def clone(self):
-        pass
+type ConcretePrototype1 struct{}
 
-class ConcretePrototype1(Prototype):
-    def clone(self):
-        # ConcretePrototype1 clone
-        return copy.deepcopy(self)
-    
-    def __str__(self):
-        return "ConcretePrototype1"
+func (c *ConcretePrototype1) Clone() Prototype {
+	// ConcretePrototype1 clone
+	return &ConcretePrototype1{}
+}
 
-class ConcretePrototype2(Prototype):
-    def clone(self):
-        # ConcretePrototype2 clone
-        return copy.deepcopy(self)
-    
-    def __str__(self):
-        return "ConcretePrototype2"
-    
+func (c *ConcretePrototype1) String() string {
+	return "ConcretePrototype1"
+}
 
-class PrototypeRegistry:
-    _prototypes = {}
+type ConcretePrototype2 struct{}
 
-    @staticmethod
-    def add_prototype(key, value):
-        if key not in PrototypeRegistry._prototypes:
-            PrototypeRegistry._prototypes[key] = value
-    
-    @staticmethod
-    def get_prototype(key):
-        if key  in PrototypeRegistry._prototypes:
-            return PrototypeRegistry._prototypes[key].clone()
-        return None
+func (c *ConcretePrototype2) Clone() Prototype {
+	// ConcretePrototype2 clone
+	return &ConcretePrototype2{}
+}
 
-    @staticmethod
-    def load():
-        PrototypeRegistry.add_prototype("CP1", ConcretePrototype1())
-        PrototypeRegistry.add_prototype("CP2", ConcretePrototype2())
+func (c *ConcretePrototype2) String() string {
+	return "ConcretePrototype2"
+}
 
-# Client code
-PrototypeRegistry.load()
-c1 = PrototypeRegistry.get_prototype("CP1")
-c2 = PrototypeRegistry.get_prototype("CP2")
-print(c1)
-print(c2)
+type PrototypeRegistry struct {
+	prototypes map[string]Prototype
+}
 
-"""
+func NewPrototypeRegistry() *PrototypeRegistry {
+	return &PrototypeRegistry{
+		prototypes: make(map[string]Prototype),
+	}
+}
+
+func (pr *PrototypeRegistry) AddPrototype(key string, value Prototype) {
+	if _, exists := pr.prototypes[key]; !exists {
+		pr.prototypes[key] = value
+	}
+}
+
+func (pr *PrototypeRegistry) GetPrototype(key string) Prototype {
+	if prototype, exists := pr.prototypes[key]; exists {
+		// Use reflection to create a deep copy of the prototype
+		return reflect.New(reflect.TypeOf(prototype).Elem()).Interface().(Prototype)
+	}
+	return nil
+}
+
+func (pr *PrototypeRegistry) Load() {
+	pr.AddPrototype("CP1", &ConcretePrototype1{})
+	pr.AddPrototype("CP2", &ConcretePrototype2{})
+}
+
+func main() {
+	prototypeRegistry := NewPrototypeRegistry()
+	prototypeRegistry.Load()
+
+	c1 := prototypeRegistry.GetPrototype("CP1")
+	c2 := prototypeRegistry.GetPrototype("CP2")
+
+	fmt.Println(c1)
+	fmt.Println(c2)
+}
+
+/*
 ConcretePrototype1
 ConcretePrototype2
-"""
+*/

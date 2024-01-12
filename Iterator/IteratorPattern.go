@@ -1,55 +1,61 @@
-from abc import ABC, abstractmethod
+package main
 
-class Aggregate(ABC):
-    @abstractmethod
-    def get_iterator(self):
-        pass
+import "fmt"
 
-class ConcreteAggregate(Aggregate):
-    def __init__(self):
-        self._data = []
+// Aggregate interface
+type Aggregate interface {
+	getIterator() Iterator
+}
 
-    def addData(self, val):
-        self._data.append(val)
+// ConcreteAggregate struct
+type ConcreteAggregate struct {
+	data []int
+}
 
-    def get_iterator(self):
-        return ConcreteIterator(self)
+func (ca *ConcreteAggregate) addData(val int) {
+	ca.data = append(ca.data, val)
+}
 
-class Iterator(ABC):
-    @abstractmethod
-    def next(self):
-        pass
-    
-    @abstractmethod
-    def has_next(self):
-        pass
+func (ca *ConcreteAggregate) getIterator() Iterator {
+	return &ConcreteIterator{aggregate: ca, index: 0}
+}
 
-class ConcreteIterator(Iterator):
-    def __init__(self, aggregate):
-        self._aggregate = aggregate
-        self._index = 0
+// Iterator interface
+type Iterator interface {
+	next() int
+	hasNext() bool
+}
 
-    def next(self):
-        if self._index >= len(self._aggregate._data):
-            raise StopIteration
-        val = self._aggregate._data[self._index]
-        self._index += 1
-        return val
-    
-    def has_next(self):
-        if self._index >= len(self._aggregate._data):
-            return False
-        return True
+// ConcreteIterator struct
+type ConcreteIterator struct {
+	aggregate *ConcreteAggregate
+	index     int
+}
 
-# Client code.
-aggregate = ConcreteAggregate()
-for i in range(5):
-    aggregate.addData(i)
+func (ci *ConcreteIterator) next() int {
+	if ci.index >= len(ci.aggregate.data) {
+		panic("StopIteration")
+	}
+	val := ci.aggregate.data[ci.index]
+	ci.index++
+	return val
+}
 
-iterator =ConcreteIterator(aggregate)
-while iterator.has_next():
-    print(iterator.next(), end=" ")
+func (ci *ConcreteIterator) hasNext() bool {
+	return ci.index < len(ci.aggregate.data)
+}
 
-"""
-0 1 2 3 4 
-"""
+// Client code
+func main() {
+	aggregate := &ConcreteAggregate{}
+	for i := 0; i < 5; i++ {
+		aggregate.addData(i)
+	}
+
+	iterator := aggregate.getIterator()
+	for iterator.hasNext() {
+		fmt.Print(iterator.next(), " ")
+	}
+
+	// Output: 0 1 2 3 4
+}

@@ -1,44 +1,57 @@
-from abc import ABC, abstractmethod
+package main
 
-class Product(ABC):
-    @abstractmethod
-    def operation(self):
-        pass
+import "fmt"
 
-class ConcreteProduct1(Product):
-    def operation(self):
-        print("Concrete Product1 Operation!")
+// Product interface
+type Product interface {
+	Operation()
+}
 
-class ConcreteProduct2(Product):
-    def operation(self):
-        print("Concrete Product2 Operation!")
+// Concrete Product classes
+type ConcreteProduct1 struct{}
 
-       
-# Creator abstract class
-class Factory(ABC):
-    @abstractmethod
-    def create_product(self):
-        pass
+func (cp1 *ConcreteProduct1) Operation() {
+	fmt.Println("Concrete Product1 Operation!")
+}
 
-# Concrete Creator classes
-class ConcreteFactory1(Factory):
-    def create_product(self):
-        return ConcreteProduct1()
+type ConcreteProduct2 struct{}
 
-class ConcreteFactory2(Factory):
-    def create_product(self):
-        return ConcreteProduct2()
+func (cp2 *ConcreteProduct2) Operation() {
+	fmt.Println("Concrete Product2 Operation!")
+}
 
-# Client code
-f = ConcreteFactory1()
-a = f.create_product()
-a.operation()
+// Creator abstract class
+type Factory interface {
+	CreateProduct() Product
+}
 
-f = ConcreteFactory2()
-a = f.create_product()
-a.operation()
+// Concrete Creator classes
+type ConcreteFactory1 struct{}
 
-""" Output:
+func (cf1 *ConcreteFactory1) CreateProduct() Product {
+	return &ConcreteProduct1{}
+}
+
+type ConcreteFactory2 struct{}
+
+func (cf2 *ConcreteFactory2) CreateProduct() Product {
+	return &ConcreteProduct2{}
+}
+
+// Client code
+func main() {
+	// ConcreteFactory1
+	f1 := &ConcreteFactory1{}
+	p1 := f1.CreateProduct()
+	p1.Operation()
+
+	// ConcreteFactory2
+	f2 := &ConcreteFactory2{}
+	p2 := f2.CreateProduct()
+	p2.Operation()
+}
+
+/*
 Concrete Product1 Operation!
 Concrete Product2 Operation!
-"""
+*/

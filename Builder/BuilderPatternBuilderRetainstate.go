@@ -1,59 +1,85 @@
-from abc import ABC, abstractmethod
+package main
 
-class Product(object):
-    def __init__(self, A = "A default", B = "B default"):
-        self.partA = A
-        self.partB = B
-        
-    def __str__(self):
-        return ("Product : (%s, %s)"%(self.partA,self.partB))
+import "fmt"
 
-class Builder(ABC):
-    @abstractmethod
-    def set_PartA(self, A):
-        pass
+// Product struct
+type Product struct {
+	partA, partB string
+}
 
-    @abstractmethod
-    def set_PartB(self, B):
-        pass
+// NewProduct constructor
+func NewProduct(A, B string) *Product {
+	return &Product{partA: A, partB: B}
+}
 
-    @abstractmethod
-    def get_Product(self):
-        pass
+// String method for Product
+func (p *Product) String() string {
+	return fmt.Sprintf("Product : (%s, %s)", p.partA, p.partB)
+}
 
-class ConcreteBuilder(Builder):
-    def set_PartA(self, A):
-        self.partA = A
-        return self  # returning self helps in chaining calls.
+// Builder interface
+type Builder interface {
+	setPartA(A string) Builder
+	setPartB(B string) Builder
+	getProduct() *Product
+}
 
-    def set_PartB(self, B):
-        self.partB = B
-        return self
+// ConcreteBuilder struct
+type ConcreteBuilder struct {
+	partA, partB string
+}
 
-    def get_Product(self):
-        return Product(self.partA, self.partB)
+// setPartA method for ConcreteBuilder
+func (cb *ConcreteBuilder) setPartA(A string) Builder {
+	cb.partA = A
+	return cb
+}
 
-class Director:
-    def __init__(self, builder):
-        self._builder = builder
+// setPartB method for ConcreteBuilder
+func (cb *ConcreteBuilder) setPartB(B string) Builder {
+	cb.partB = B
+	return cb
+}
 
-    def construct(self):
-        return self._builder.set_PartA("A1").set_PartB("B1").get_Product() # chining calls
+// getProduct method for ConcreteBuilder
+func (cb *ConcreteBuilder) getProduct() *Product {
+	return NewProduct(cb.partA, cb.partB)
+}
 
-    def construct2(self):
-        self._builder.set_PartA("A2")
-        self._builder.set_PartB("B2")
-        return  self._builder.get_Product()
+// Director struct
+type Director struct {
+	builder Builder
+}
 
-# Client code.
-builder = ConcreteBuilder()
-director = Director(builder)
-product = director.construct()
-print(product)
-product2 = director.construct2()
-print(product2)
+// NewDirector constructor
+func NewDirector(builder Builder) *Director {
+	return &Director{builder: builder}
+}
 
-"""
+// construct method for Director
+func (d *Director) construct() *Product {
+	return d.builder.setPartA("A1").setPartB("B1").getProduct()
+}
+
+// construct2 method for Director
+func (d *Director) construct2() *Product {
+	d.builder.setPartA("A2").setPartB("B2")
+	return d.builder.getProduct()
+}
+
+func main() {
+	// Client code.
+	builder := &ConcreteBuilder{}
+	director := NewDirector(builder)
+
+	product := director.construct()
+	fmt.Println(product)
+
+	product2 := director.construct2()
+	fmt.Println(product2)
+}
+
+/*
 Product : (A1, B1)
 Product : (A2, B2)
-"""
+*/

@@ -1,49 +1,82 @@
+package main
 
-from abc import ABC, abstractmethod
+import "fmt"
 
-class Shape(ABC): # Abstraction
-    def __init__(self, imp):
-        self._imp = imp
+// Color interface (Implementor)
+type Color interface {
+	Fill() string
+}
 
-    @abstractmethod
-    def draw(self):
-        pass
+// Shape interface (Abstraction)
+type Shape interface {
+	Draw()
+}
 
-class Rectangle(Shape):
-    def draw(self):
-        print("Drawing Rectangle with color %s "%(self._imp.fill()))
+// Rectangle struct
+type Rectangle struct {
+	color Color
+}
 
-class Circle(Shape):
-    def draw(self):
-        print("Drawing Circle with color %s "%(self._imp.fill()))
+// NewRectangle constructor
+func NewRectangle(color Color) *Rectangle {
+	return &Rectangle{color: color}
+}
 
-class Color(ABC): # Implementor
-    @abstractmethod
-    def fill(self):
-        pass
+// Draw method for Rectangle
+func (r *Rectangle) Draw() {
+	fmt.Printf("Drawing Rectangle with color %s\n", r.color.Fill())
+}
 
-class Red(Color):
-    def fill(self):
-        return "Red"
+// Circle struct
+type Circle struct {
+	color Color
+}
 
-class Green(Color):
-    def fill(self):
-        return "Green"
+// NewCircle constructor
+func NewCircle(color Color) *Circle {
+	return &Circle{color: color}
+}
 
-class Blue(Color):
-    def fill(self):
-        return "Blue"
+// Draw method for Circle
+func (c *Circle) Draw() {
+	fmt.Printf("Drawing Circle with color %s\n", c.color.Fill())
+}
 
-# Client code.
-c1 = Red()
-abstraction = Circle(c1)
-abstraction.draw()
+// Red struct
+type Red struct{}
 
-c1 = Green()
-abstraction = Rectangle(c1)
-abstraction.draw()
+// Fill method for Red
+func (r *Red) Fill() string {
+	return "Red"
+}
 
-"""
-Drawing Circle with color Red 
-Drawing Rectangle with color Green 
-"""
+// Green struct
+type Green struct{}
+
+// Fill method for Green
+func (g *Green) Fill() string {
+	return "Green"
+}
+
+// Blue struct
+type Blue struct{}
+
+// Fill method for Blue
+func (b *Blue) Fill() string {
+	return "Blue"
+}
+
+func main() {
+	c1 := &Red{}
+	circle := NewCircle(c1)
+	circle.Draw() // Output: Drawing Circle with color Red
+
+	c2 := &Green{}
+	rectangle := NewRectangle(c2)
+	rectangle.Draw() // Output: Drawing Rectangle with color Green
+}
+
+/*
+Drawing Circle with color Red
+Drawing Rectangle with color Green
+*/

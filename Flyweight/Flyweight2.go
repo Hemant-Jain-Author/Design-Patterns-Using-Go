@@ -1,45 +1,70 @@
-from abc import ABC, abstractmethod
+package main
 
-class Flyweight(ABC):
-    def __init__(self, intrinsic_state):
-        self.intrinsic_state = intrinsic_state  # intrinsic state  # repeted state
+import "fmt"
 
-    @abstractmethod
-    def operation(self, extrinsic_state): # extrinsic state
-        pass
+// Flyweight interface
+type Flyweight interface {
+	Operation(extrinsicState string)
+}
 
-class ConcreteFlyweight(Flyweight):
-    def operation(self, extrinsic_state):
-        print("Operation inside concrete flyweight.")
+// ConcreteFlyweight type
+type ConcreteFlyweight struct {
+	intrinsicState string
+}
 
+func (cf *ConcreteFlyweight) Operation(extrinsicState string) {
+	fmt.Println("Operation inside concrete flyweight.")
+}
 
-class FlyweightFactory:
-    def __init__(self):
-        self._flyweights = {}
+// FlyweightFactory type
+type FlyweightFactory struct {
+	flyweights map[string]Flyweight
+}
 
-    def get_flyweight(self, intrinsic_state):
-        if intrinsic_state not in self._flyweights:
-            self._flyweights[intrinsic_state] = ConcreteFlyweight(intrinsic_state)
-        return self._flyweights[intrinsic_state]
+func NewFlyweightFactory() *FlyweightFactory {
+	return &FlyweightFactory{
+		flyweights: make(map[string]Flyweight),
+	}
+}
 
-class ClientClass:
-    def __init__(self, factory, intrinsic_state, extrinsic_state):
-        self.flyweitht = factory.get_flyweight(intrinsic_state) 
-        self.extrinsic_state = extrinsic_state
+func (ff *FlyweightFactory) GetFlyweight(intrinsicState string) Flyweight {
+	if _, exists := ff.flyweights[intrinsicState]; !exists {
+		ff.flyweights[intrinsicState] = &ConcreteFlyweight{intrinsicState: intrinsicState}
+	}
+	return ff.flyweights[intrinsicState]
+}
 
-    def operation(self):
-        print("Operation inside context.")
-        self.flyweitht.operation(self.extrinsic_state)
+// ClientClass type
+type ClientClass struct {
+	flyweight       Flyweight
+	extrinsicState  string
+}
 
+func NewClientClass(factory *FlyweightFactory, intrinsicState, extrinsicState string) *ClientClass {
+	return &ClientClass{
+		flyweight:      factory.GetFlyweight(intrinsicState),
+		extrinsicState: extrinsicState,
+	}
+}
 
+func (cc *ClientClass) Operation() {
+	fmt.Println("Operation inside context.")
+	cc.flyweight.Operation(cc.extrinsicState)
+}
 
-# Client code
-factory = FlyweightFactory()
-c = ClientClass(factory, "common", "separate1")
-c.operation()
+func main() {
+	// Client code
+	factory := NewFlyweightFactory()
+	c := NewClientClass(factory, "common", "separate1")
+	c.Operation()
 
-c2 = ClientClass(factory, "common", "separate2")
-c2.operation()
+	c2 := NewClientClass(factory, "common", "separate2")
+	c2.Operation()
+}
 
-print(c, c2)
-print(c.flyweitht, c2.flyweitht)
+/*
+Operation inside context.
+Operation inside concrete flyweight.
+Operation inside context.
+Operation inside concrete flyweight.
+*/

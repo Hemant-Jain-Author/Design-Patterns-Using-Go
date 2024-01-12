@@ -1,56 +1,75 @@
-import collections.abc
+package main
 
-class LinkedList(collections.abc.Iterable):
-    # Node class representing elements of linked list.
-    class Node:
-        def __init__(self, v, n=None):
-            self.value = v
-            self.next = n
-            
-    # Constructor of linked list.
-    def __init__(self):
-        self.head = None
-        self.tail = None
-        self.size = 0
+import "fmt"
 
-    def add_tail(self, value):
-        new_node = self.Node(value, None)
-        if self.head == None:
-            self.head = new_node
-        else:
-            self.tail.next = new_node
-        self.tail = new_node
+// Node struct representing elements of linked list
+type Node struct {
+	value int
+	next  *Node
+}
 
-    def add_head(self, value):
-        new_node = self.Node(value, self.head)
-        if self.head == None:
-            self.tail = new_node
-        self.head = new_node
+// LinkedList struct representing a linked list
+type LinkedList struct {
+	head *Node
+	tail *Node
+	size int
+}
 
-    def __iter__(self):
-        return LinkedListIterator(self)
+// AddTail adds a new node to the tail of the linked list
+func (ll *LinkedList) AddTail(value int) {
+	newNode := &Node{value: value, next: nil}
+	if ll.head == nil {
+		ll.head = newNode
+	} else {
+		ll.tail.next = newNode
+	}
+	ll.tail = newNode
+	ll.size++
+}
 
+// AddHead adds a new node to the head of the linked list
+func (ll *LinkedList) AddHead(value int) {
+	newNode := &Node{value: value, next: ll.head}
+	if ll.head == nil {
+		ll.tail = newNode
+	}
+	ll.head = newNode
+	ll.size++
+}
 
-class LinkedListIterator(collections.abc.Iterator):
-    def __init__(self, aggregate):
-        self.aggregate = aggregate
-        self.curr = aggregate.head
+// LinkedListIterator struct representing an iterator for the linked list
+type LinkedListIterator struct {
+	aggregate *LinkedList
+	curr      *Node
+}
 
-    def __next__(self):
-        if self.curr == None:  # if no_elements_to_traverse:
-            raise StopIteration
-        val = self.curr.value
-        self.curr = self.curr.next
-        return val
+// NewLinkedListIterator creates a new iterator for the linked list
+func NewLinkedListIterator(aggregate *LinkedList) *LinkedListIterator {
+	return &LinkedListIterator{
+		aggregate: aggregate,
+		curr:      aggregate.head,
+	}
+}
 
-# Client code.
-aggregate = LinkedList()
-for i in range(5):
-    aggregate.add_head(i)
+// Next returns the next element in the iteration
+func (li *LinkedListIterator) Next() int {
+	if li.curr == nil {
+		return -1 // Use a sentinel value to indicate the end of the iteration
+	}
+	val := li.curr.value
+	li.curr = li.curr.next
+	return val
+}
 
-for val in aggregate:
-    print(val, end=" ")
+func main() {
+	aggregate := &LinkedList{}
+	for i := 0; i < 5; i++ {
+		aggregate.AddHead(i)
+	}
 
-"""
-4 3 2 1 0 
-"""
+	iterator := NewLinkedListIterator(aggregate)
+
+	for val := iterator.Next(); val != -1; val = iterator.Next() {
+		fmt.Print(val, " ")
+	}
+}

@@ -1,44 +1,64 @@
-from abc import ABC, abstractmethod
+package main
 
-class Component(ABC):
-    @abstractmethod
-    def operation(self):
-        pass
+import "fmt"
 
-class ConcreteComponent(Component):
-    def operation(self):
-        print("ConcreteComponent operation.")
+// Component is the interface for the base component
+type Component interface {
+	Operation()
+}
 
-class Decorator(Component):
-    def __init__(self, component):
-        self._component = component
+// ConcreteComponent is the concrete implementation of Component
+type ConcreteComponent struct{}
 
-    @abstractmethod
-    def operation(self):
-        pass
+// Operation implements the Operation method for ConcreteComponent
+func (c *ConcreteComponent) Operation() {
+	fmt.Println("ConcreteComponent operation.")
+}
 
-class ConcreteDecorator1(Decorator):
-    def operation(self):
-        print("ConcreteDecorator1 operation start.")
-        self._component.operation()
-        print("ConcreteDecorator1 operation end.")
+// Decorator is the interface for the decorator
+type Decorator interface {
+	Operation()
+}
 
-class ConcreteDecorator2(Decorator):
-    def operation(self):
-        print("ConcreteDecorator2 operation start.")
-        self._component.operation()
-        print("ConcreteDecorator2 operation end.")
+// BaseDecorator provides default implementation for the Operation method
+type BaseDecorator struct {
+	component Component
+}
 
-#Client code.
-component = ConcreteComponent()
-decorator1 = ConcreteDecorator1(component)
-decorator2 = ConcreteDecorator2(decorator1)
-decorator2.operation()
+// Operation implements the Operation method for BaseDecorator
+func (d *BaseDecorator) Operation() {
+	d.component.Operation()
+}
 
-"""
-ConcreteDecorator2 operation start.
-ConcreteDecorator1 operation start.
-ConcreteComponent operation.
-ConcreteDecorator1 operation end.
-ConcreteDecorator2 operation end.
-"""
+// ConcreteDecorator1 is a concrete decorator
+type ConcreteDecorator1 struct {
+	BaseDecorator
+}
+
+// Operation implements the Operation method for ConcreteDecorator1
+func (d *ConcreteDecorator1) Operation() {
+	fmt.Println("ConcreteDecorator1 operation start.")
+	d.BaseDecorator.Operation()
+	fmt.Println("ConcreteDecorator1 operation end.")
+}
+
+// ConcreteDecorator2 is another concrete decorator
+type ConcreteDecorator2 struct {
+	BaseDecorator
+}
+
+// Operation implements the Operation method for ConcreteDecorator2
+func (d *ConcreteDecorator2) Operation() {
+	fmt.Println("ConcreteDecorator2 operation start.")
+	d.BaseDecorator.Operation()
+	fmt.Println("ConcreteDecorator2 operation end.")
+}
+
+// Client code
+func main() {
+	component := &ConcreteComponent{}
+	decorator1 := &ConcreteDecorator1{BaseDecorator{component}}
+	decorator2 := &ConcreteDecorator2{BaseDecorator{decorator1}}
+
+	decorator2.Operation()
+}

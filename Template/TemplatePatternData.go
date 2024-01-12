@@ -1,54 +1,65 @@
-from abc import ABC, abstractmethod
+package main
 
-class AddDataTemplate(ABC):
-    
-    def add_data(self): # Final
-        self.open()
-        self.add()
-        self.close()
+import "fmt"
 
-    @abstractmethod
-    def open(self):
-        pass
+// AddDataTemplate is the abstract class defining the template method.
+type AddDataTemplate interface {
+	addData()
+	open()
+	add()
+	close()
+}
 
-    @abstractmethod
-    def add(self):
-        pass
-    
-    @abstractmethod
-    def close(self):
-        pass
+// AddDataToFile is a concrete implementation of AddDataTemplate for adding data to a file.
+type AddDataToFile struct{}
 
+func (a *AddDataToFile) addData() {
+	a.open()
+	a.add()
+	a.close()
+}
 
-class AddDataToFile(AddDataTemplate):
-    def open(self):
-        print("Open file.")
+func (a *AddDataToFile) open() {
+	fmt.Println("Open file.")
+}
 
-    def add(self):
-        print("Add data to file.")
-    
-    def close(self):
-        print("Close file")
-        
-class AddDataToDB(AddDataTemplate):
-    def open(self):
-        print("Open Database.")
+func (a *AddDataToFile) add() {
+	fmt.Println("Add data to file.")
+}
 
-    def add(self):
-        print("Add data to Database.")
-    
-    def close(self):
-        print("Close Database.")  
+func (a *AddDataToFile) close() {
+	fmt.Println("Close file.")
+}
 
-# Client Code 
-o = AddDataToDB()
-o.add_data()
+// AddDataToDB is another concrete implementation of AddDataTemplate for adding data to a database.
+type AddDataToDB struct{}
 
-"""
+func (a *AddDataToDB) addData() {
+	a.open()
+	a.add()
+	a.close()
+}
+
+func (a *AddDataToDB) open() {
+	fmt.Println("Open Database.")
+}
+
+func (a *AddDataToDB) add() {
+	fmt.Println("Add data to Database.")
+}
+
+func (a *AddDataToDB) close() {
+	fmt.Println("Close Database.")
+}
+
+func main() {
+	// Client Code
+	o := &AddDataToDB{}
+	o.addData()
+}
+
+/*
 Open Database.
 Add data to Database.
 Close Database.
-"""
-
-
-
+*/

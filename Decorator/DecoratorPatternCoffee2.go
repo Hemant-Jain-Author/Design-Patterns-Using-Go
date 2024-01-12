@@ -1,49 +1,69 @@
-from abc import ABC, abstractmethod
+package main
 
-class ICoffee (ABC):
-    @abstractmethod
-    def get_cost(self):
-        pass
-    
-    @abstractmethod
-    def get_ingredients(self):
-        pass
+import (
+	"fmt"
+)
 
-class SimpleCoffee(ICoffee):
-    def get_cost(self):
-        return 10
+// ICoffee is the interface for coffee
+type ICoffee interface {
+	GetCost() int
+	GetIngredients() string
+}
 
-    def get_ingredients(self):
-        return "Coffee"
+// SimpleCoffee is a simple concrete implementation of ICoffee
+type SimpleCoffee struct{}
 
-class CoffeeDecorator(ICoffee):
-    def __init__(self, component, name = "", cost = 0):
-        self._component = component
-        self._cost = cost
-        self._name = name
+// GetCost implements the GetCost method for SimpleCoffee
+func (c *SimpleCoffee) GetCost() int {
+	return 10
+}
 
-    def get_cost(self):
-        return self._component.get_cost() + self._cost
-    
-    def get_ingredients(self):
-        return self._component.get_ingredients() + ", " + self._name
+// GetIngredients implements the GetIngredients method for SimpleCoffee
+func (c *SimpleCoffee) GetIngredients() string {
+	return "Coffee"
+}
 
-class MilkDecorator(CoffeeDecorator):
-    def __init__(self, component):
-        super().__init__(component, "Milk", 4)
+// CoffeeDecorator is the interface for coffee decorators
+type CoffeeDecorator interface {
+	ICoffee
+}
 
-class EspressoDecorator (CoffeeDecorator):
-    def __init__(self, component):
-        super().__init__(component, "Espresso", 5)
+// BaseCoffeeDecorator provides default implementation for the CoffeeDecorator interface
+type BaseCoffeeDecorator struct {
+	component ICoffee
+	name      string
+	cost      int
+}
 
-# Client code
-component = SimpleCoffee()
-decorator1 = MilkDecorator(component)
-decorator2 = EspressoDecorator(decorator1)
-print("Coffee cost is :: %s" %decorator2.get_cost())
-print("Coffee ingredients are :: %s" %decorator2.get_ingredients())
+// GetCost implements the GetCost method for BaseCoffeeDecorator
+func (d *BaseCoffeeDecorator) GetCost() int {
+	return d.component.GetCost() + d.cost
+}
 
+// GetIngredients implements the GetIngredients method for BaseCoffeeDecorator
+func (d *BaseCoffeeDecorator) GetIngredients() string {
+	return d.component.GetIngredients() + ", " + d.name
+}
 
-latte = MilkDecorator(MilkDecorator(SimpleCoffee()))
-print("Coffee cost is :: %s" %latte.get_cost())
-print("Coffee ingredients are :: %s" %latte.get_ingredients())
+// MilkDecorator is a concrete decorator for adding milk to coffee
+type MilkDecorator struct {
+	BaseCoffeeDecorator
+}
+
+// EspressoDecorator is a concrete decorator for adding espresso to coffee
+type EspressoDecorator struct {
+	BaseCoffeeDecorator
+}
+
+func main() {
+	component := &SimpleCoffee{}
+	decorator1 := &MilkDecorator{BaseCoffeeDecorator: BaseCoffeeDecorator{component, "Milk", 4}}
+	decorator2 := &EspressoDecorator{BaseCoffeeDecorator: BaseCoffeeDecorator{decorator1, "Espresso", 5}}
+
+	fmt.Printf("Coffee cost is :: %d\n", decorator2.GetCost())
+	fmt.Printf("Coffee ingredients are :: %s\n", decorator2.GetIngredients())
+
+	latte := &MilkDecorator{BaseCoffeeDecorator: BaseCoffeeDecorator{&MilkDecorator{BaseCoffeeDecorator: BaseCoffeeDecorator{&SimpleCoffee{}}}, "Milk", 4}}
+	fmt.Printf("Coffee cost is :: %d\n", latte.GetCost())
+	fmt.Printf("Coffee ingredients are :: %s\n", latte.GetIngredients())
+}

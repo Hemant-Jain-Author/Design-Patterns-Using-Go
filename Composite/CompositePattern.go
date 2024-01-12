@@ -1,42 +1,68 @@
+package main
 
-from abc import ABC, abstractmethod
+import "fmt"
 
-class Component(ABC):
-    @abstractmethod
-    def operation(self):
-        pass
+// Component interface
+type Component interface {
+	operation()
+}
 
-class Composite(Component):
-    def __init__(self):
-        self._children = set()
+// Composite struct
+type Composite struct {
+	children []Component
+}
 
-    def operation(self):
-        print("Composite Operation")
-        for child in self._children:
-            child.operation()
+// NewComposite constructor for Composite
+func NewComposite() *Composite {
+	return &Composite{
+		children: make([]Component, 0),
+	}
+}
 
-    def add(self, component):
-        self._children.add(component)
+// operation method for Composite
+func (c *Composite) operation() {
+	fmt.Println("Composite Operation")
+	for _, child := range c.children {
+		child.operation()
+	}
+}
 
-    def remove(self, component):
-        self._children.discard(component)
+// add method for Composite
+func (c *Composite) add(component Component) {
+	c.children = append(c.children, component)
+}
 
+// remove method for Composite
+func (c *Composite) remove(component Component) {
+	for i, child := range c.children {
+		if child == component {
+			c.children = append(c.children[:i], c.children[i+1:]...)
+			break
+		}
+	}
+}
 
-class Leaf(Component):
-    def operation(self):
-        print("Leaf Operation")
+// Leaf struct
+type Leaf struct{}
 
-# Client code.
-composite = Composite()
-composite.add(Leaf())
-composite2 = Composite()
-composite2.add(Leaf())
-composite.add(composite2)
-composite.operation()
+// operation method for Leaf
+func (l *Leaf) operation() {
+	fmt.Println("Leaf Operation")
+}
 
-"""
-Composite Operation
+func main() {
+	// Client code.
+	composite := NewComposite()
+	composite.add(&Leaf{})
+	composite2 := NewComposite()
+	composite2.add(&Leaf{})
+	composite.add(composite2)
+	composite.operation()
+}
+
+/*
 Composite Operation
 Leaf Operation
+Composite Operation
 Leaf Operation
-"""
+*/

@@ -1,76 +1,96 @@
-from abc import ABC, abstractmethod
+package main
 
-class Mediator(ABC):
-    @abstractmethod
-    def add_colleague(self, Colleague):
-        pass
+import (
+	"fmt"
+)
 
-    @abstractmethod
-    def send_message(self, message, ColleagueId):
-        pass
-    
-        
-class ConcreteMediator(Mediator):
-    def __init__(self):
-        self.Colleagues = {}
-  
-    def add_colleague(self, Colleague):
-        self.Colleagues[Colleague.id] = Colleague
+// Mediator interface
+type Mediator interface {
+	addColleague(colleague Colleague)
+	sendMessage(message string, colleagueID string)
+}
 
-    def send_message(self, message, ColleagueId):
-        print("Mediator pass Message : " + message)
-        self.Colleagues[ColleagueId].receive(message)
+// ConcreteMediator struct
+type ConcreteMediator struct {
+	colleagues map[string]Colleague
+}
 
+func (m *ConcreteMediator) addColleague(colleague Colleague) {
+	m.colleagues[colleague.getID()] = colleague
+}
 
-class Colleague(ABC):
-    @abstractmethod
-    def __init__(self, mediator):
-        pass 
-    
-    @abstractmethod
-    def send(self, message, to):
-        pass
- 
-    @abstractmethod
-    def receive(self, message):
-        pass
+func (m *ConcreteMediator) sendMessage(message string, colleagueID string) {
+	fmt.Printf("Mediator pass Message: %s\n", message)
+	m.colleagues[colleagueID].receive(message)
+}
 
+// Colleague interface
+type Colleague interface {
+	getID() string
+	send(message string, to string)
+	receive(message string)
+}
 
-class ConcreteColleague1(object):
-    def __init__(self, mediator):
-        self.id = "First"
-        self.mediator = mediator 
-    
-    def send(self, message, to):
-        print(self.id + " Sent Message : " + message)
-        self.mediator.send_message(message, to)
- 
-    def receive(self, message):
-        print(self.id + " Received Message " + message)
+// ConcreteColleague1 struct
+type ConcreteColleague1 struct {
+	mediator Mediator
+	id       string
+}
 
+func (c *ConcreteColleague1) getID() string {
+	return c.id
+}
 
-class ConcreteColleague2(object):
-    def __init__(self, mediator):
-        self.id = "Second"
-        self.mediator = mediator 
-    
-    def send(self, message, to):
-        print(self.id + " Sent Message : " + message)
-        self.mediator.send_message(message, to)
- 
-    def receive(self, message):
-        print(self.id + " Received Message " + message)
+func (c *ConcreteColleague1) send(message string, to string) {
+	fmt.Printf("%s Sent Message: %s\n", c.id, message)
+	c.mediator.sendMessage(message, to)
+}
 
-# Client code.
-mediator = ConcreteMediator()
-first = ConcreteColleague1(mediator)
-mediator.add_colleague(first)
-second = ConcreteColleague2(mediator)
-mediator.add_colleague(second)
-first.send("Hello, World!", "Second")
+func (c *ConcreteColleague1) receive(message string) {
+	fmt.Printf("%s Received Message %s\n", c.id, message)
+}
 
-"""
-First Sent Message : Hello, World!
-Mediator pass Message : Hello, World!
+// ConcreteColleague2 struct
+type ConcreteColleague2 struct {
+	mediator Mediator
+	id       string
+}
+
+func (c *ConcreteColleague2) getID() string {
+	return c.id
+}
+
+func (c *ConcreteColleague2) send(message string, to string) {
+	fmt.Printf("%s Sent Message: %s\n", c.id, message)
+	c.mediator.sendMessage(message, to)
+}
+
+func (c *ConcreteColleague2) receive(message string) {
+	fmt.Printf("%s Received Message %s\n", c.id, message)
+}
+
+func main() {
+	mediator := &ConcreteMediator{
+		colleagues: make(map[string]Colleague),
+	}
+
+	first := &ConcreteColleague1{
+		mediator: mediator,
+		id:       "First",
+	}
+	mediator.addColleague(first)
+
+	second := &ConcreteColleague2{
+		mediator: mediator,
+		id:       "Second",
+	}
+	mediator.addColleague(second)
+
+	first.send("Hello, World!", "Second")
+}
+
+/*
+First Sent Message: Hello, World!
+Mediator pass Message: Hello, World!
 Second Received Message Hello, World!
-"""
+*/

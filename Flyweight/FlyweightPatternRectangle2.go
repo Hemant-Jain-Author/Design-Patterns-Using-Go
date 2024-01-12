@@ -1,68 +1,84 @@
-from abc import ABC, abstractmethod
-import random
-import timeit
+package main
 
-class Shape(ABC):
-    def __init__(self, color):
-        self._color = color # Intrinsic State
-        self._demoData = [0]*10000 # demo Intrinsic State.
+import (
+	"fmt"
+	"math/rand"
+	"time"
+)
 
-    @abstractmethod
-    def draw(self, x1, y1, x2, y2): # Extrinsic State
-        pass
+// Shape interface
+type Shape interface {
+	Draw(x1, y1, x2, y2 int)
+}
 
-class RectangeIntrinsic(Shape):
-    def draw(self, x1, y1, x2, y2):
-        print("Draw rectange color:%s topleft: (%s,%s) rightBottom: (%s,%s)"%(self._color,x1, y1, x2, y2) )
+// RectangleWithIntrinsic type
+type RectangleWithIntrinsic struct {
+	color string // Intrinsic State
+}
 
-class RectangeFactory:
-    def __init__(self):
-        self._shapes = {}
+func NewRectangleWithIntrinsic(color string) *RectangleWithIntrinsic {
+	return &RectangleWithIntrinsic{color: color}
+}
 
-    def get_Rectange(self, color):
-        if color not in self._shapes:
-            self._shapes[color] = RectangeIntrinsic(color)
-        return self._shapes[color]
+func (r *RectangleWithIntrinsic) Draw(x1, y1, x2, y2 int) {
+	fmt.Printf("Draw rectangle color:%s topleft: (%d,%d) rightBottom: (%d,%d)\n", r.color, x1, y1, x2, y2)
+}
 
+// RectangleFactory type
+type RectangleFactory struct {
+	shapes map[string]Shape
+}
 
-class Rectangle:
-    def __init__(self, factory, color, x1, y1, x2, y2):
-        self.flyweitht = factory.get_Rectange(color)
-        self.x1 = x1
-        self.x2 = x2
-        self.y1 = y1
-        self.y2 = y2
+func NewRectangleFactory() *RectangleFactory {
+	return &RectangleFactory{
+		shapes: make(map[string]Shape),
+	}
+}
 
-    def draw(self):
-        print("Operation inside Rectangle.")
-        self.flyweitht.draw(self.x1, self.y1, self.x2, self.y2)
+func (rf *RectangleFactory) GetRectangle(color string) Shape {
+	if shape, exists := rf.shapes[color]; exists {
+		return shape
+	}
 
-# Client code
-def test():
-    factory = RectangeFactory()
-    rarr = []
-    for i in range(10000):
-        rarr.append(Rectangle(factory, random.randint(1,10), random.randint(1,100), random.randint(1,100), random.randint(1,100), random.randint(1,100)))
+	shape := NewRectangleWithIntrinsic(color)
+	rf.shapes[color] = shape
+	return shape
+}
 
+// Rectangle type without flyweight
+type Rectangle struct {
+	color string // Intrinsic State
+	x1, y1, x2, y2 int // Extrinsic State
+}
 
-class Rectangle2:
-    def __init__(self, color, x1, y1, x2, y2):
-        self._color = color 
-        self._demoData = [0]*10000 # demo Intrinsic State.
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
+func NewRectangle(color string, x1, y1, x2, y2 int) *Rectangle {
+	return &Rectangle{
+		color: color,
+		x1: x1, y1: y1,
+		x2: x2, y2: y2,
+	}
+}
 
-    def draw(self):
-        print("Draw rectange color:%s topleft: (%s,%s) rightBottom: (%s,%s)"%(self._color,self.x1, self.y1, self.x2, self.y2) )
-        
+func (r *Rectangle) Draw() {
+	fmt.Printf("Draw rectangle color:%s topleft: (%d,%d) rightBottom: (%d,%d)\n", r.color, r.x1, r.y1, r.x2, r.y2)
+}
 
-def test2():
-    rarr2 = []
-    for i in range(10000):
-        rarr2.append(Rectangle2(random.randint(1,10), random.randint(1,100), random.randint(1,100), random.randint(1,100), random.randint(1,100)))
+func main() {
+	rand.Seed(time.Now().UnixNano())
 
+	// Test with flyweight pattern
+	factory := NewRectangleFactory()
+	start := time.Now()
+	for i := 0; i < 10000; i++ {
+		factory.GetRectangle(fmt.Sprintf("%d", rand.Intn(10))).Draw(rand.Intn(100), rand.Intn(100), rand.Intn(100), rand.Intn(100))
+	}
+	fmt.Printf("Elapsed time with flyweight pattern: %v\n", time.Since(start))
 
-print(timeit.timeit(test, number=1))
-print(timeit.timeit(test2, number=1))
+	// Test without flyweight pattern
+	start = time.Now()
+	for i := 0; i < 10000; i++ {
+		rect := NewRectangle(fmt.Sprintf("%d", rand.Intn(10)), rand.Intn(100), rand.Intn(100), rand.Intn(100), rand.Intn(100))
+		rect.Draw()
+	}
+	fmt.Printf("Elapsed time without flyweight pattern: %v\n", time.Since(start))
+}

@@ -1,76 +1,92 @@
-from abc import ABC, abstractmethod
+package main
 
-class Shape(ABC): 
-    @abstractmethod
-    def accept(self, visitor):
-        pass
+import "fmt"
 
-class Circle(Shape):
-    def __init__(self, x, y, radius):
-        self.x = x
-        self.y = y
-        self.radius = radius
-        
-    def accept(self, visitor):
-        return visitor.visit_circle(self)
+// Shape is the abstract class defining the accept method.
+type Shape interface {
+	accept(visitor Visitor) string
+}
 
-class Rectangle(Shape):
-    def __init__(self, x, y, width, height):
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
+// Circle is a concrete implementation of Shape for circles.
+type Circle struct {
+	x, y, radius int
+}
 
-    def accept(self, visitor):
-        return visitor.visit_rectange(self)
+func (c *Circle) accept(visitor Visitor) string {
+	return visitor.visitCircle(c)
+}
 
-class Visitor(ABC):
-    def visit_circle(self, element):
-        pass
+// Rectangle is another concrete implementation of Shape for rectangles.
+type Rectangle struct {
+	x, y, width, height int
+}
 
-    def visit_rectange(self, element):
-        pass
-        
-class XMLVisitor(Visitor):
-    def visit_circle(self, element):
-        return "<circle>\n  <x>%s</x>\n  <y>%s</y>\n  <radius>%s</radius>\n</circle>"%(element.x, element.y, element.radius) 
+func (r *Rectangle) accept(visitor Visitor) string {
+	return visitor.visitRectangle(r)
+}
 
-    def visit_rectange(self, element):
-        return "<rectangle>\n  <x>%s</x>\n  <y>%s</y>\n  <width>%s</width>\n  <height>%s</height>\n</rectangle>"%(element.x, element.y, element.width, element.height)
+// Visitor is the abstract class defining the visit methods.
+type Visitor interface {
+	visitCircle(circle *Circle) string
+	visitRectangle(rectangle *Rectangle) string
+}
 
-class TextVisitor(Visitor):
-    def visit_circle(self, element):
-        return "Circle ( (x : %s, y : %s), radius : %s) "%(element.x, element.y, element.radius)
+// XMLVisitor is a concrete implementation of Visitor for generating XML representation.
+type XMLVisitor struct{}
 
-    def visit_rectange(self, element):
-        return "Rectangle ( (x : %s, y : %s), width : %s, height : %s)"%(element.x, element.y, element.width, element.height)
+func (v *XMLVisitor) visitCircle(circle *Circle) string {
+	return fmt.Sprintf("<circle>\n  <x>%d</x>\n  <y>%d</y>\n  <radius>%d</radius>\n</circle>", circle.x, circle.y, circle.radius)
+}
 
-class ObjectsStructure:
-    def __init__(self):
-        self.shapes = []
+func (v *XMLVisitor) visitRectangle(rectangle *Rectangle) string {
+	return fmt.Sprintf("<rectangle>\n  <x>%d</x>\n  <y>%d</y>\n  <width>%d</width>\n  <height>%d</height>\n</rectangle>", rectangle.x, rectangle.y, rectangle.width, rectangle.height)
+}
 
-    def add_shapes(self, shape):
-        self.shapes.append(shape)
+// TextVisitor is another concrete implementation of Visitor for generating text representation.
+type TextVisitor struct{}
 
-    def set_visitor(self, visitor):
-        self.visitor = visitor
+func (v *TextVisitor) visitCircle(circle *Circle) string {
+	return fmt.Sprintf("Circle ( (x : %d, y : %d), radius : %d)", circle.x, circle.y, circle.radius)
+}
 
-    def accept(self):
-        for shape in self.shapes:
-            print(shape.accept(self.visitor))
+func (v *TextVisitor) visitRectangle(rectangle *Rectangle) string {
+	return fmt.Sprintf("Rectangle ( (x : %d, y : %d), width : %d, height : %d)", rectangle.x, rectangle.y, rectangle.width, rectangle.height)
+}
 
-# Test Code
-os = ObjectsStructure()
-os.add_shapes(Rectangle(6,7,8,9))
-os.add_shapes(Circle(6,7,8))
-os.set_visitor(XMLVisitor())
-os.accept()
+// ObjectsStructure is the structure holding a collection of shapes.
+type ObjectsStructure struct {
+	shapes  []Shape
+	visitor Visitor
+}
 
-os.set_visitor(TextVisitor())
-os.accept()
+func (os *ObjectsStructure) addShapes(shape Shape) {
+	os.shapes = append(os.shapes, shape)
+}
 
-"""
-Output:
+func (os *ObjectsStructure) setVisitor(visitor Visitor) {
+	os.visitor = visitor
+}
+
+func (os *ObjectsStructure) accept() {
+	for _, shape := range os.shapes {
+		fmt.Println(shape.accept(os.visitor))
+	}
+}
+
+func main() {
+	// Test Code
+	os := &ObjectsStructure{}
+	os.addShapes(&Rectangle{6, 7, 8, 9})
+	os.addShapes(&Circle{6, 7, 8})
+
+	os.setVisitor(&XMLVisitor{})
+	os.accept()
+
+	os.setVisitor(&TextVisitor{})
+	os.accept()
+}
+
+/*
 <rectangle>
   <x>6</x>
   <y>7</y>
@@ -82,12 +98,6 @@ Output:
   <y>7</y>
   <radius>8</radius>
 </circle>
-<dot>
-  <x>6</x>
-  <y>7</y>
-</dot>
-
 Rectangle ( (x : 6, y : 7), width : 8, height : 9)
-Circle ( (x : 6, y : 7), radius : 8) 
-Dot ( x : 6, y : 7)
-"""
+Circle ( (x : 6, y : 7), radius : 8)
+*/

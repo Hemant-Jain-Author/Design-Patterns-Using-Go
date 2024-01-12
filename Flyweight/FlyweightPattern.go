@@ -1,39 +1,61 @@
-from abc import ABC, abstractmethod
+package main
 
-class Flyweight(ABC):
-    def __init__(self, intrinsic_state):
-        self.intrinsic_state = intrinsic_state  # intrinsic state
+import (
+	"fmt"
+)
 
-    @abstractmethod
-    def operation(self, extrinsic_state): # extrinsic state
-        pass
+// Flyweight interface
+type Flyweight interface {
+	Operation(extrinsicState interface{})
+}
 
-class ConcreteFlyweight(Flyweight):
-    def operation(self, extrinsic_state):
-        print("Operation inside concrete flyweight")
+// ConcreteFlyweight type
+type ConcreteFlyweight struct {
+	intrinsicState string
+}
 
-class FlyweightFactory:
-    def __init__(self):
-        self._flyweights = {}
+func (cf *ConcreteFlyweight) Operation(extrinsicState interface{}) {
+	fmt.Println("Operation inside concrete flyweight")
+}
 
-    def get_flyweight(self, key):
-        if key not in self._flyweights:
-            self._flyweights[key] = ConcreteFlyweight(key)
-        return self._flyweights[key]
-    
-    def get_count(self):
-        return len(self._flyweights)
+// FlyweightFactory type
+type FlyweightFactory struct {
+	flyweights map[string]Flyweight
+}
 
-# Client code.
-factory = FlyweightFactory()
-flyweight1 = factory.get_flyweight("key")
-flyweight2 = factory.get_flyweight("key")
-flyweight1.operation(None)
-print(flyweight1, flyweight2)
-print("Object count:", factory.get_count())
+func NewFlyweightFactory() *FlyweightFactory {
+	return &FlyweightFactory{
+		flyweights: make(map[string]Flyweight),
+	}
+}
 
-"""
+func (ff *FlyweightFactory) GetFlyweight(key string) Flyweight {
+	if flyweight, exists := ff.flyweights[key]; exists {
+		return flyweight
+	}
+
+	flyweight := &ConcreteFlyweight{intrinsicState: key}
+	ff.flyweights[key] = flyweight
+	return flyweight
+}
+
+func (ff *FlyweightFactory) GetCount() int {
+	return len(ff.flyweights)
+}
+
+func main() {
+	// Client code
+	factory := NewFlyweightFactory()
+	flyweight1 := factory.GetFlyweight("key")
+	flyweight2 := factory.GetFlyweight("key")
+
+	flyweight1.Operation(nil)
+	fmt.Println(flyweight1, flyweight2)
+	fmt.Println("Object count:", factory.GetCount())
+}
+
+/*
 Operation inside concrete flyweight
-<__main__.ConcreteFlyweight object at 0x000002A12546BBB0> <__main__.ConcreteFlyweight object at 0x000002A12546BBB0>
+&{key} &{key}
 Object count: 1
-"""
+*/

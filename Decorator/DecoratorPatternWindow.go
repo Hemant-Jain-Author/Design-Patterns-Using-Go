@@ -1,40 +1,55 @@
-from abc import ABC, abstractmethod
+package main
 
-class Window(ABC):
-    @abstractmethod
-    def draw(self):
-        pass
+import "fmt"
 
-class SimpleWindow(Window):
-    def draw(self):
-        print("SimpleWindow draw.")
+// Window is the interface for windows
+type Window interface {
+	Draw()
+}
 
-class Decorator(Window):
-    def __init__(self, component):
-        self._component = component
+// SimpleWindow is a simple concrete implementation of Window
+type SimpleWindow struct{}
 
-    @abstractmethod
-    def draw(self):
-        pass
+// Draw implements the Draw method for SimpleWindow
+func (w *SimpleWindow) Draw() {
+	fmt.Println("SimpleWindow draw.")
+}
 
-class VerticalScrollBarDecorator(Decorator):
-    def draw(self):
-        self._component.draw()
-        print("VerticalScrollBarDecorator draw")
+// Decorator is the interface for window decorators
+type Decorator interface {
+	Window
+}
 
-class HorizontalScrollBarDecorator(Decorator):
-    def draw(self):
-        self._component.draw()
-        print("HorizontalScrollBarDecorator draw")
+// BaseDecorator provides default implementation for the Decorator interface
+type BaseDecorator struct {
+	component Window
+}
 
-# Client code
-component = SimpleWindow()
-decorator1 = VerticalScrollBarDecorator(component)
-decorator2 = HorizontalScrollBarDecorator(decorator1)
-decorator2.draw()
+// VerticalScrollBarDecorator is a concrete decorator for adding a vertical scrollbar to a window
+type VerticalScrollBarDecorator struct {
+	BaseDecorator
+}
 
-"""
-SimpleWindow draw.
-VerticalScrollBarDecorator draw
-HorizontalScrollBarDecorator draw
-"""
+// Draw implements the Draw method for VerticalScrollBarDecorator
+func (d *VerticalScrollBarDecorator) Draw() {
+	d.component.Draw()
+	fmt.Println("VerticalScrollBarDecorator draw.")
+}
+
+// HorizontalScrollBarDecorator is a concrete decorator for adding a horizontal scrollbar to a window
+type HorizontalScrollBarDecorator struct {
+	BaseDecorator
+}
+
+// Draw implements the Draw method for HorizontalScrollBarDecorator
+func (d *HorizontalScrollBarDecorator) Draw() {
+	d.component.Draw()
+	fmt.Println("HorizontalScrollBarDecorator draw.")
+}
+
+func main() {
+	component := &SimpleWindow{}
+	decorator1 := &VerticalScrollBarDecorator{BaseDecorator{component}}
+	decorator2 := &HorizontalScrollBarDecorator{BaseDecorator{decorator1}}
+	decorator2.Draw()
+}

@@ -31,7 +31,11 @@ class Square(Rectangle):
 def testRect(rect):
     rect.set_height(10)
     rect.set_width(20)
-    assert 10*20 == rect.get_height()*rect.get_width()
+    if 10*20 == rect.get_height()*rect.get_width():
+        print("Pass")
+    else:
+        print("Failed")
+
 
 # Client code.
 r = Rectangle(10, 20)
@@ -39,4 +43,9 @@ testRect(r)
 
 s = Square(10)
 s.set_width(20)
-#testRect(s)
+testRect(s)
+
+"""
+Pass
+Failed
+"""

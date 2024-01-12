@@ -1,54 +1,78 @@
-class Courses(object):
-    def __init__(self):
-        self._course_students = {}
+package main
 
-    def subscribe(self, subject, student):
-        if subject not in self._course_students:
-            self._course_students[subject] = set()
-        self._course_students[subject].add(student)
+import "fmt"
 
-    def unsubscribe(self, subject, student):
-        if subject in self._course_students:
-            self._course_students[subject].discard(student)
+type Courses struct {
+	courseStudents map[string]map[*Student]struct{}
+}
 
-    def publish(self, subject, message):
-        if subject not in self._course_students:
-            print(f"No subscribers for subject '{subject}'.")
-            return
-        for student in self._course_students[subject]:
-            student.notify(subject, message)
+func NewCourses() *Courses {
+	return &Courses{
+		courseStudents: make(map[string]map[*Student]struct{}),
+	}
+}
 
+func (c *Courses) Subscribe(subject string, student *Student) {
+	if _, ok := c.courseStudents[subject]; !ok {
+		c.courseStudents[subject] = make(map[*Student]struct{})
+	}
+	c.courseStudents[subject][student] = struct{}{}
+}
 
-class Student(object):
-    def __init__(self, name):
-        self.name = name
+func (c *Courses) Unsubscribe(subject string, student *Student) {
+	if students, ok := c.courseStudents[subject]; ok {
+		delete(students, student)
+		if len(students) == 0 {
+			delete(c.courseStudents, subject)
+		}
+	}
+}
 
-    def notify(self, subject, message):
-        print(f"{self.name} received message on subject '{subject}': {message}")
+func (c *Courses) Publish(subject, message string) {
+	if students, ok := c.courseStudents[subject]; ok {
+		for student := range students {
+			student.Notify(subject, message)
+		}
+	} else {
+		fmt.Printf("No subscribers for subject '%s'.\n", subject)
+	}
+}
 
+type Student struct {
+	Name string
+}
 
-# Client code.
-courses = Courses()
-john = Student('John')
-eric = Student('Eric')
-jack = Student('Jack')
+func NewStudent(name string) *Student {
+	return &Student{Name: name}
+}
 
-courses.subscribe('English', john)
-courses.subscribe('English', eric)
-courses.subscribe('Maths', eric)
-courses.subscribe('Science', jack)
+func (s *Student) Notify(subject, message string) {
+	fmt.Printf("%s received message on subject '%s': %s\n", s.Name, subject, message)
+}
 
-courses.publish('English', 'Tomorrow class at 11')
-courses.publish('Maths', 'Tomorrow class at 1')
+func main() {
+	courses := NewCourses()
+	john := NewStudent("John")
+	eric := NewStudent("Eric")
+	jack := NewStudent("Jack")
 
-# Unsubscribe Eric from English
-courses.unsubscribe('English', eric)
+	courses.Subscribe("English", john)
+	courses.Subscribe("English", eric)
+	courses.Subscribe("Maths", eric)
+	courses.Subscribe("Science", jack)
 
-courses.publish('English', 'Updated schedule for English')
+	courses.Publish("English", "Tomorrow class at 11")
+	courses.Publish("Maths", "Tomorrow class at 1")
 
-"""
-Eric received message on subject 'English': Tomorrow class at 11
+	// Unsubscribe Eric from English
+	courses.Unsubscribe("English", eric)
+
+	courses.Publish("English", "Updated schedule for English")
+}
+
+/*
 John received message on subject 'English': Tomorrow class at 11
+Eric received message on subject 'English': Tomorrow class at 11
 Eric received message on subject 'Maths': Tomorrow class at 1
 John received message on subject 'English': Updated schedule for English
-"""
+*/

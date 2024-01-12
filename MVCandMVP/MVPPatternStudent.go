@@ -1,52 +1,69 @@
+package main
 
-class Student:
-    def __init__(self, name, id):
-        self.name = name
-        self.id = id
+import "fmt"
 
-class Model(object):
-    # Dummy model which just have one object.  
-    # Model is supposed to interact with database.
-    def __init__(self):
-        self.st = Student("Harry", 1)
+type Student struct {
+    Name string
+    ID   int
+}
 
-    def set_data(self, name, id):
-        print("Model: Set data :", name, id)
-        self.st.name = name
-        self.st.id = id
+type Model struct {
+    st Student
+}
 
-    def get_data(self):
-        print("Model: Get data.")
-        return self.st
+func NewModel() *Model {
+    return &Model{st: Student{Name: "Harry", ID: 1}}
+}
 
-class View(object):
-    # Dummy view which is print some data to standard output.
-    # View is supposed to intaract the UI. 
-    def update(self, name, id):
-        print("View: Student Info :", name , id)
+func (m *Model) SetData(name string, id int) {
+    fmt.Println("Model: Set data :", name, id)
+    m.st.Name = name
+    m.st.ID = id
+}
 
-class Presenter(object):
-    def __init__(self):
-        self.model = Model()
-        self.view = View()
+func (m *Model) GetData() Student {
+    fmt.Println("Model: Get data.")
+    return m.st
+}
 
-    def set_data(self, name, id):
-        print("Presenter: Receive data from client.")
-        self.model.set_data(name, id)
+type View struct{}
 
-    def update_view(self):
-        print("Presenter: Receive update from client.")
-        data = self.model.get_data()
-        self.view.update(data.name, data.id)
+func (v *View) Update(name string, id int) {
+    fmt.Println("View: Student Info :", name, id)
+}
 
-# Client code
-presenter = Presenter()
-presenter.update_view()
+type Presenter struct {
+    model *Model
+    view  *View
+}
 
-presenter.set_data("jack", 2)
-presenter.update_view()
+func NewPresenter() *Presenter {
+    return &Presenter{
+        model: NewModel(),
+        view:  &View{},
+    }
+}
 
-"""
+func (p *Presenter) SetData(name string, id int) {
+    fmt.Println("Presenter: Receive data from client.")
+    p.model.SetData(name, id)
+}
+
+func (p *Presenter) UpdateView() {
+    fmt.Println("Presenter: Receive update from client.")
+    data := p.model.GetData()
+    p.view.Update(data.Name, data.ID)
+}
+
+func main() {
+    presenter := NewPresenter()
+    presenter.UpdateView()
+
+    presenter.SetData("jack", 2)
+    presenter.UpdateView()
+}
+
+/*
 Presenter: Receive update from client.
 Model: Get data.
 View: Student Info : Harry 1
@@ -55,4 +72,4 @@ Model: Set data : jack 2
 Presenter: Receive update from client.
 Model: Get data.
 View: Student Info : jack 2
-"""
+*/

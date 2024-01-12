@@ -1,39 +1,50 @@
+package main
 
-from abc import ABC, abstractmethod
+import "fmt"
 
-class Abstraction(ABC):
-    def __init__(self, imp):
-        self._imp = imp
+// Implementor interface
+type Implementor interface {
+	Operation()
+}
 
-    @abstractmethod
-    def operation(self):
-        pass
+// Abstraction struct
+type Abstraction struct {
+	imp Implementor
+}
 
-class ConcreteAbstraction(Abstraction):
-    def operation(self):
-        self._imp.operation()
+// NewAbstraction constructor
+func NewAbstraction(imp Implementor) *Abstraction {
+	return &Abstraction{imp: imp}
+}
 
+// Operation method for Abstraction
+func (a *Abstraction) Operation() {
+	a.imp.Operation()
+}
 
-class Implementor(ABC):
-    @abstractmethod
-    def operation(self):
-        pass
+// ConcreteImplementor1 struct
+type ConcreteImplementor1 struct{}
 
+// Operation method for ConcreteImplementor1
+func (c *ConcreteImplementor1) Operation() {
+	fmt.Println("ConcreteImplementor1 operation")
+}
 
-class ConcreteImplementor1(Implementor):
-    def operation(self):
-        print("ConcreteImplementor1 operation")
+// ConcreteImplementor2 struct
+type ConcreteImplementor2 struct{}
 
+// Operation method for ConcreteImplementor2
+func (c *ConcreteImplementor2) Operation() {
+	fmt.Println("ConcreteImplementor2 operation")
+}
 
-class ConcreteImplementor2(Implementor):
-    def operation(self):
-        print("ConcreteImplementor2 operation")
+// Client Code
+func main() {
+	c1 := &ConcreteImplementor1{}
+	abstraction := NewAbstraction(c1)
+	abstraction.Operation()
+}
 
-# Client code.
-c1 = ConcreteImplementor1()
-abstraction = ConcreteAbstraction(c1)
-abstraction.operation()
-
-"""
+/*
 ConcreteImplementor1 operation
-"""
+*/

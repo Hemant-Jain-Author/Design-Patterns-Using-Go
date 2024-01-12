@@ -1,43 +1,56 @@
-from abc import ABC, abstractmethod
+package main
 
-class Shape(ABC):
-    @abstractmethod
-    def draw(self):
-        pass
+import "fmt"
 
-class Circle(Shape):
-    def __init__(self, x, y, r):
-        self.x = x
-        self.y = y
-        self.radious = r
+// Student struct
+type Student struct {
+	name string
+}
 
-    def draw(self):
-        print("Draw the Circle.")
+// NewStudent constructor
+func NewStudent(name string) *Student {
+	return &Student{name: name}
+}
 
+// String method for Student
+func (s *Student) String() string {
+	return fmt.Sprintf("Student: %s", s.name)
+}
 
-class Rectange:
-    def __init__(self, x, y, l, w):
-        self.x = x
-        self.y = y
-        self.length = l
-        self.width = w
+// Class struct
+type Class struct {
+	className string
+	students  []*Student
+}
 
-    def old_draw(self):
-        print("Drawing Rectangle.")
-        
+// NewClass constructor
+func NewClass(className string) *Class {
+	return &Class{className: className, students: []*Student{}}
+}
 
-class RectangeAdapter(Shape):
-    def __init__(self, x, y, l, w):
-        self._adaptee = Rectange(x, y, l, w)
-        
-    def draw(self):
-        self._adaptee.old_draw()
+// AddStudent method for Class
+func (c *Class) AddStudent(st *Student) {
+	c.students = append(c.students, st)
+}
 
+// Display method for Class
+func (c *Class) Display() {
+	for _, student := range c.students {
+		fmt.Println(student)
+	}
+}
 
-# Client Code
-adapter = RectangeAdapter(1,2,3,4)
-adapter.draw()
+// Client Code
+func main() {
+	c := NewClass("SS1")
+	s1 := NewStudent("John Smith")
+	s2 := NewStudent("Jane Smith")
+	c.AddStudent(s1)
+	c.AddStudent(s2)
+	c.Display()
+}
 
-"""
-Drawing Rectangle.
-"""
+/*
+Student: John Smith
+Student: Jane Smith
+*/

@@ -1,49 +1,86 @@
-# Abstraction
-class Shape:
-    def __init__(self, implementation):
-        self.implementation = implementation
-        
-    def draw(self):
-        pass
-    
-# Concrete Abstraction
-class Square(Shape):
-    def draw(self):
-        self.implementation.draw_square()
-        
-class Circle(Shape):
-    def draw(self):
-        self.implementation.draw_circle()
-    
-# Implementation
-class DrawingAPI:
-    def draw_square(self):
-        pass
-    
-    def draw_circle(self):
-        pass
-    
-# Concrete Implementation
-class WindowsAPI(DrawingAPI):
-    def draw_square(self):
-        print("Drawing a square on Windows.")
-        
-    def draw_circle(self):
-        print("Drawing a circle on Windows.")
-        
-class MacAPI(DrawingAPI):
-    def draw_square(self):
-        print("Drawing a square on Mac.")
-        
-    def draw_circle(self):
-        print("Drawing a circle on Mac.")
-        
-# Usage
-windows_api = WindowsAPI()
-mac_api = MacAPI()
+package main
 
-square = Square(windows_api)
-square.draw() # Output: Drawing a square on Windows.
+import "fmt"
 
-circle = Circle(mac_api)
-circle.draw() # Output: Drawing a circle on Mac.
+// DrawingAPI interface
+type DrawingAPI interface {
+	DrawSquare()
+	DrawCircle()
+}
+
+// Shape struct
+type Shape struct {
+	implementation DrawingAPI
+}
+
+// NewShape constructor
+func NewShape(implementation DrawingAPI) *Shape {
+	return &Shape{implementation: implementation}
+}
+
+// Draw method for Shape
+func (s *Shape) Draw() {
+	// Common draw logic for all shapes
+}
+
+// Square struct
+type Square struct {
+	*Shape
+}
+
+// Draw method for Square
+func (sq *Square) Draw() {
+	sq.implementation.DrawSquare()
+}
+
+// Circle struct
+type Circle struct {
+	*Shape
+}
+
+// Draw method for Circle
+func (c *Circle) Draw() {
+	c.implementation.DrawCircle()
+}
+
+// WindowsAPI struct
+type WindowsAPI struct{}
+
+// DrawSquare method for WindowsAPI
+func (w *WindowsAPI) DrawSquare() {
+	fmt.Println("Drawing a square on Windows.")
+}
+
+// DrawCircle method for WindowsAPI
+func (w *WindowsAPI) DrawCircle() {
+	fmt.Println("Drawing a circle on Windows.")
+}
+
+// MacAPI struct
+type MacAPI struct{}
+
+// DrawSquare method for MacAPI
+func (m *MacAPI) DrawSquare() {
+	fmt.Println("Drawing a square on Mac.")
+}
+
+// DrawCircle method for MacAPI
+func (m *MacAPI) DrawCircle() {
+	fmt.Println("Drawing a circle on Mac.")
+}
+
+func main() {
+	windowsAPI := &WindowsAPI{}
+	macAPI := &MacAPI{}
+
+	square := &Square{NewShape(windowsAPI)}
+	square.Draw() // Output: Drawing a square on Windows.
+
+	circle := &Circle{NewShape(macAPI)}
+	circle.Draw() // Output: Drawing a circle on Mac.
+}
+
+/*
+Drawing a square on Windows.
+Drawing a circle on Mac.
+*/

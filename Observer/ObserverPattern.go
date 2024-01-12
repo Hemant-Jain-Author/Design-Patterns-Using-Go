@@ -1,70 +1,85 @@
-from abc import ABC, abstractmethod
+package main
 
-class Subject(ABC):
-    def __init__(self):
-        self.__observers = []
+import "fmt"
 
-    def attach(self, observer):
-        observer._subject = self
-        self.__observers.append(observer)
+// Subject interface
+type Subject interface {
+	Attach(observer Observer)
+	Detach(observer Observer)
+	Notify()
+}
 
-    def detach(self, observer):
-        observer._subject = None
-        self.__observers.remove(observer)
+// ConcreteSubject struct
+type ConcreteSubject struct {
+	state     string
+	observers []Observer
+}
 
-    def notify(self):
-        for observer in self.__observers:
-            observer.update()
+func (s *ConcreteSubject) Attach(observer Observer) {
+	observer.SetSubject(s)
+	s.observers = append(s.observers, observer)
+}
 
+func (s *ConcreteSubject) Detach(observer Observer) {
+	for i, obs := range s.observers {
+		if obs == observer {
+			observer.SetSubject(nil)
+			s.observers = append(s.observers[:i], s.observers[i+1:]...)
+			break
+		}
+	}
+}
 
-class ConcreteSubject(Subject):
-    def __init__(self):
-        self.__state = None
-        super().__init__()
+func (s *ConcreteSubject) Notify() {
+	for _, observer := range s.observers {
+		observer.Update()
+	}
+}
 
-    def get_states(self):
-        return self.__state
+func (s *ConcreteSubject) GetState() string {
+	return s.state
+}
 
-    def set_states(self, arg):
-        self.__state = arg
-        self.notify()
+func (s *ConcreteSubject) SetState(state string) {
+	s.state = state
+	s.Notify()
+}
 
+// Observer interface
+type Observer interface {
+	Update()
+	SetSubject(subject Subject)
+}
 
-class Observer(ABC):
-    def __init__(self, sub):
-        self._subject = sub
-        self._subject.attach(self)
+// ConcreteObserver struct
+type ConcreteObserver struct {
+	subject Subject
+}
 
-    @abstractmethod
-    def update(self):
-        pass
+func (o *ConcreteObserver) Update() {
+	state := o.subject.(*ConcreteSubject).GetState()
+	fmt.Printf("%s notified to Observer\n", state)
+}
 
-class ConcreteObserver1(Observer):
-    def __init__(self, subject):
-        super().__init__(subject)
+func (o *ConcreteObserver) SetSubject(subject Subject) {
+	o.subject = subject
+}
 
-    def update(self):
-        print(self._subject.get_states() + " notified to Observer1")
+func main() {
+	subject := &ConcreteSubject{}
+	observer1 := &ConcreteObserver{}
+	observer2 := &ConcreteObserver{}
 
-class ConcreteObserver2(Observer):
-    def __init__(self, subject):
-        super().__init__(subject)
+	subject.Attach(observer1)
+	subject.Attach(observer2)
 
-    def update(self):
-        print(self._subject.get_states() + " notified to Observer2")
+	subject.SetState("First state")
+	subject.SetState("Second state")
+}
 
-
-# Client Code.
-subject = ConcreteSubject()
-observer1 = ConcreteObserver1(subject)
-observer2 = ConcreteObserver2(subject)
-subject.set_states("First state")
-subject.set_states("Second state")
-
-
-"""
-First state notified to Observer1
-First state notified to Observer2
-Second state notified to Observer1
-Second state notified to Observer2
-"""
+/*
+First state notified to Observer
+First state notified to Observer
+Second state notified to Observer
+Second state notified to Observer
+*/

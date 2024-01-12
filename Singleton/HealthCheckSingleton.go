@@ -1,25 +1,35 @@
-class HealthCheck:
-    _instance = None
-    # _servers = []
+package main
 
-    def __new__(cls):
-        if not HealthCheck._instance:
-            HealthCheck._instance = super(HealthCheck, cls).__new__(cls)
-            cls._servers = []
-        return HealthCheck._instance
+import "fmt"
 
-    def addServer(self):
-        self._servers.append("Server 1")
-        self._servers.append("Server 2")
+type HealthCheck struct {
+	servers []string
+}
 
-    def changeServer(self):
-        self._servers.pop()
-        self._servers.append("Server 5")
+var instance *HealthCheck
 
-# Client code. 
-hc1 = HealthCheck()
-hc1.addServer()
-hc2 = HealthCheck()
-hc2.addServer()
-print(hc1._servers)
-print(hc2._servers)
+func NewHealthCheck() *HealthCheck {
+	if instance == nil {
+		instance = &HealthCheck{}
+	}
+	return instance
+}
+
+func (hc *HealthCheck) addServer() {
+	hc.servers = append(hc.servers, "Server 1", "Server 2")
+}
+
+func (hc *HealthCheck) changeServer() {
+	hc.servers = append(hc.servers[:len(hc.servers)-1], "Server 5")
+}
+
+func main() {
+	hc1 := NewHealthCheck()
+	hc1.addServer()
+
+	hc2 := NewHealthCheck()
+	hc2.addServer()
+
+	fmt.Println(hc1.servers)
+	fmt.Println(hc2.servers)
+}

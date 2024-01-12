@@ -1,38 +1,53 @@
+package main
 
-from abc import ABC, abstractmethod
+import "fmt"
 
-class BookParser(ABC):
-    @abstractmethod
-    def __init__(self, book):
-        pass
-        
-    @abstractmethod
-    def num_pages(self, book):
-        pass
+// BookParser is an interface representing a book parser.
+type BookParser interface {
+	NumPages() int
+}
 
+// ConcreteBookParser is a concrete implementation of the BookParser interface.
+type ConcreteBookParser struct {
+	book       string
+	numOfPages int
+}
 
-class ConcreteBookParser(BookParser):
-    def __init__(self, book):
-        print("Concrete Subject Request Method")
-        # Number of pages calculation heavy operation.
-        # Suppose this calculation come to 1000 pages.
-        self._num_pages = 1000
+func NewConcreteBookParser(book string) *ConcreteBookParser {
+	fmt.Println("Concrete Subject Request Method")
+	// Number of pages calculation heavy operation.
+	// Suppose this calculation comes to 1000 pages.
+	return &ConcreteBookParser{
+		book:       book,
+		numOfPages: 1000,
+	}
+}
 
-    def num_pages(self):
-        print("Concrete Subject Request Method")
-        return self._num_pages
+func (cbp *ConcreteBookParser) NumPages() int {
+	fmt.Println("Concrete Subject Request Method")
+	return cbp.numOfPages
+}
 
+// LazyBookParserProxy is a proxy implementation of the BookParser interface.
+type LazyBookParserProxy struct {
+	book    string
+	subject BookParser
+}
 
-class LazyBookParserProxy(BookParser):
-    def __init__(self, book):
-        self._book = book
-        self._subject = None
+func (lbp *LazyBookParserProxy) NumPages() int {
+	if lbp.subject == nil {
+		lbp.subject = NewConcreteBookParser(lbp.book)
+	}
+	return lbp.subject.NumPages()
+}
 
-    def num_pages(self):
-        if self._subject == None:
-            self._subject = ConcreteBookParser(self._book)
-        return self._subject.num_pages()
+func main() {
+	proxy := &LazyBookParserProxy{book: "LOTR"}
+	fmt.Println(proxy.NumPages())
+}
 
-# Client code
-proxy = LazyBookParserProxy("LOTR")
-print(proxy.num_pages())
+/*
+Concrete Subject Request Method
+Concrete Subject Request Method
+1000
+*/

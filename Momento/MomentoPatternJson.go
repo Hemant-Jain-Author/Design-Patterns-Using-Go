@@ -1,119 +1,122 @@
-# unoptimized but working lots of extra Memento 
-# objects are created.
+package main
 
-import copy
+import (
+	"fmt"
+)
 
-class Memento :
-    def __init__(self, state) :
-        self.state = state  
+// Memento struct - wrapper around state
+type Memento struct {
+	state map[string]interface{}
+}
 
-    def get_state(self) :
-        return self.state
+func (m *Memento) GetState() map[string]interface{} {
+	return m.state
+}
 
-class Originator :
-    def set_state(self, state) :
-        self.state = state
-    
-    def get_state(self) :
-        return self.__dict__
-    
-    def create_memento(self) :
-        return Memento(self.__dict__)
-    
-    def set_memento(self, m) :
-        print(m.get_state())
-        self.__dict__ = m.get_state()
 
-class CareTaker :
-    def __init__(self):
-        self.history = []
-        self.top = -1
-        self.max = -1
-    
-    def add_memento(self, m) :
-        self.top += 1
-        self.max = self.top
-        if self.top <= len(self.history) - 1:
-            self.history[self.top] = copy.deepcopy(m)
-        else :
-            self.history.append(copy.deepcopy(m))
-            
-    def get_memento(self, index) :
-        return self.history[index]
-    
-    def undo(self) :
-        print("Undoing state.")
-        if (self.top <= 0):
-            return copy.deepcopy(self.get_memento(0))
-        
-        self.top -= 1
-        return copy.deepcopy(self.get_memento(self.top))
+// Originator struct
+type Originator struct {
+	state map[string]interface{}
+}
 
-    def redo(self) :
-        print("Redoing state.")
-        if (self.top >= (len(self.history) -  1) or self.top >= self.max) :
-            return copy.deepcopy(self.get_memento(self.top))
-        
-        self.top += 1
-        return copy.deepcopy(self.get_memento(self.top))
-    
-    def get_states_count(self) :
-        return len(self.history)
-    
+func (o *Originator) SetState(state map[string]interface{}) {
+	o.state = state
+}
 
-# Client code.
-originator = Originator()
-care_taker = CareTaker()
+func (o *Originator) GetState() map[string]interface{} {
+	return o.state
+}
 
-originator.set_state("State 1")
-care_taker.add_memento(originator.create_memento())
-print(originator.get_state())
+func (o *Originator) CreateMemento() *Memento {
+	return &Memento{state: o.GetState()}
+}
 
-originator.set_state("State 2")
-care_taker.add_memento(originator.create_memento())
-print(originator.get_state())
+func (o *Originator) SetMemento(m *Memento) {
+	o.state = m.GetState()
+}
 
-originator.set_state("State 3")
-care_taker.add_memento(originator.create_memento())
-print(originator.get_state())
+// CareTaker struct - manages history
+type CareTaker struct {
+	history []Memento
+	top     int
+	max     int
+}
 
-originator.set_memento(care_taker.undo())
-print(originator.get_state())
+func NewCareTaker() *CareTaker {
+	return &CareTaker{
+		history: make([]Memento, 0),
+		top:     -1,
+		max:     -1,
+	}
+}
 
-originator.set_memento(care_taker.undo())
-print(originator.get_state())
+func (c *CareTaker) AddMemento(m *Memento) {
+	c.top++
+	c.max = c.top
+	if c.top <= len(c.history)-1 {
+		c.history[c.top] = *m
+	} else {
+		c.history = append(c.history, *m)
+	}
+}
 
-originator.set_state("State 4")
-care_taker.add_memento(originator.create_memento())
-print(originator.get_state())
+func (c *CareTaker) GetMemento(index int) *Memento {
+	return &c.history[index]
+}
 
-originator.set_memento(care_taker.redo())
-print(originator.get_state())
+func (c *CareTaker) Undo() *Memento {
+	fmt.Println("Undoing state.")
+	if c.top <= 0 {
+		c.top = 0
+		return c.GetMemento(0)
+	}
 
-originator.set_memento(care_taker.redo())
-print(originator.get_state())
+	c.top--
+	return c.GetMemento(c.top)
+}
 
-originator.set_memento(care_taker.redo())
-print(originator.get_state())
+func (c *CareTaker) Redo() *Memento {
+	fmt.Println("Redoing state.")
+	if c.top >= len(c.history)-1 || c.top >= c.max {
+		return c.GetMemento(c.top)
+	}
 
-"""
-{'state': 'State 1'}
-{'state': 'State 2'}
-{'state': 'State 3'}
-Undoing state.
-{'state': 'State 2'}
-{'state': 'State 2'}
-Undoing state.
-{'state': 'State 1'}
-{'state': 'State 1'}
-{'state': 'State 4'}
-Redoing state.
-{'state': 'State 4'}
-{'state': 'State 4'}
-Redoing state.
-{'state': 'State 4'}
-{'state': 'State 4'}
-Redoing state.
-{'state': 'State 4'}
-{'state': 'State 4'}
-"""
+	c.top++
+	return c.GetMemento(c.top)
+}
+
+func main() {
+	originator := &Originator{}
+	careTaker := NewCareTaker()
+
+	originator.SetState(map[string]interface{}{"state": "State 1"})
+	careTaker.AddMemento(originator.CreateMemento())
+	fmt.Println(originator.GetState())
+
+	originator.SetState(map[string]interface{}{"state": "State 2"})
+	careTaker.AddMemento(originator.CreateMemento())
+	fmt.Println(originator.GetState())
+
+	originator.SetState(map[string]interface{}{"state": "State 3"})
+	careTaker.AddMemento(originator.CreateMemento())
+	fmt.Println(originator.GetState())
+
+	originator.SetMemento(careTaker.Undo())
+	fmt.Println(originator.GetState())
+
+	originator.SetMemento(careTaker.Undo())
+	fmt.Println(originator.GetState())
+
+	originator.SetState(map[string]interface{}{"state": "State 4"})
+	careTaker.AddMemento(originator.CreateMemento())
+	fmt.Println(originator.GetState())
+
+	originator.SetMemento(careTaker.Redo())
+	fmt.Println(originator.GetState())
+
+	originator.SetMemento(careTaker.Redo())
+	fmt.Println(originator.GetState())
+
+	originator.SetMemento(careTaker.Redo())
+	fmt.Println(originator.GetState())
+}

@@ -1,41 +1,69 @@
-import math
+package main
 
-class Rectangle(object):
-    def __init__(self, length, breadth):
-        self.__length = length
-        self.__breadth = breadth
-  
-    def area(self):
-        return self.__length * self.__breadth
- 
-    def perimeter(self):
-        return 2 * (self.__length + self.__breadth)
-    
-    # overloading + operator
-    def __add__(self, rec):
-        return Rectangle(self.__length + rec.__length, self.__breadth + rec.__breadth)
- 
-    # overloading - operator
-    def __sub__(self, rec):
-        return Rectangle(abs(self.__length - rec.__length), abs(self.__breadth - rec.__breadth))
- 
-    # overloading == operator
-    def __eq__(self, rec):
-        return (self.__length == rec.__length) and (self.__breadth == rec.__breadt)
- 
-    # overriding __str__ function
-    def __str__(self):
-        return "Rectange length and width: %s %s" % (self.__length , self.__breadth )
- 
- 
-r1 = Rectangle(4, 6)
-r2 = Rectangle(10, 6) 
-print("Is r1 == r2 ?", r1 == r2)   
- 
-r3 = r1 + r2  
-r4 = r1 - r2  
+import (
+	"fmt"
+	"math"
+)
 
-print(r1)  
-print(r2)  
-print(r3)  
-print(r4)  
+// Rectangle struct
+type Rectangle struct {
+	length, breadth float64
+}
+
+// NewRectangle constructor
+func NewRectangle(length, breadth float64) *Rectangle {
+	return &Rectangle{length: length, breadth: breadth}
+}
+
+// Area method for Rectangle
+func (r *Rectangle) Area() float64 {
+	return r.length * r.breadth
+}
+
+// Perimeter method for Rectangle
+func (r *Rectangle) Perimeter() float64 {
+	return 2 * (r.length + r.breadth)
+}
+
+// Add method for Rectangle (overloading + operator)
+func (r *Rectangle) Add(rec *Rectangle) *Rectangle {
+	return NewRectangle(r.length+rec.length, r.breadth+rec.breadth)
+}
+
+// Subtract method for Rectangle (overloading - operator)
+func (r *Rectangle) Subtract(rec *Rectangle) *Rectangle {
+	return NewRectangle(math.Abs(r.length-rec.length), math.Abs(r.breadth-rec.breadth))
+}
+
+// Equals method for Rectangle (overloading == operator)
+func (r *Rectangle) Equals(rec *Rectangle) bool {
+	return r.length == rec.length && r.breadth == rec.breadth
+}
+
+// String method for Rectangle (overriding __str__ function)
+func (r *Rectangle) String() string {
+	return fmt.Sprintf("Rectangle length and breadth: %.2f %.2f", r.length, r.breadth)
+}
+
+func main() {
+	r1 := NewRectangle(4, 6)
+	r2 := NewRectangle(10, 6)
+
+	fmt.Printf("Is r1 == r2 ? %t\n", r1.Equals(r2))
+
+	r3 := r1.Add(r2)
+	r4 := r1.Subtract(r2)
+
+	fmt.Println(r1)
+	fmt.Println(r2)
+	fmt.Println(r3)
+	fmt.Println(r4)
+}
+
+/*
+Is r1 == r2 ? false
+Rectangle length and breadth: 4.00 6.00
+Rectangle length and breadth: 10.00 6.00
+Rectangle length and breadth: 14.00 12.00
+Rectangle length and breadth: 6.00 0.00
+*/

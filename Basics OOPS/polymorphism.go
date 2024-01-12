@@ -1,18 +1,39 @@
-class adder :
-    def __init__(self):
-        self.__sum = 0   # private variable
-    
-    def increment(self, a):
-        self.__sum += a   
+package main
 
-    def increment(self):
-        self.__sum += 1
+import "fmt"
 
-    def getValue(self):
-        return self.__sum
+// Adder struct
+type Adder struct {
+	sum int
+}
 
+// NewAdder constructor
+func NewAdder() *Adder {
+	return &Adder{sum: 0}
+}
 
-a = adder()
-a.increment(10)
-a.increment()
-print(a.getValue())
+// Increment method with one parameter
+func (a *Adder) IncrementByValue(value int) {
+	a.sum += value
+}
+
+// Increment method without parameters
+func (a *Adder) Increment() {
+	a.sum++
+}
+
+// GetValue method for Adder
+func (a *Adder) GetValue() int {
+	return a.sum
+}
+
+func main() {
+	adder := NewAdder()
+	adder.IncrementByValue(10)
+	adder.Increment()
+	fmt.Println(adder.GetValue())
+}
+
+/*
+11
+*/
