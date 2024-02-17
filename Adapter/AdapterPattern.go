@@ -20,7 +20,7 @@ func (a *Adapter) Operation() {
 type Adaptee struct{}
 
 func (a *Adaptee) SomeOperation() {
-	fmt.Println("Adaptee some_operation() function called.")
+	fmt.Println("Adaptee SomeOperation() function called.")
 }
 
 // Client Code
@@ -30,5 +30,5 @@ func main() {
 }
 
 /*
-Adaptee some_operation() function called.
+Adaptee SomeOperation() function called.
 */

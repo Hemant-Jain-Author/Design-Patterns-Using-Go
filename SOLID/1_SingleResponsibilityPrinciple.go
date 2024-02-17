@@ -56,8 +56,8 @@ func main() {
     animal2.eat()
 
     animal3 := Bird{Animal{"Eagle"}}
-    animal3.fly()
     animal3.layEggs()
+    animal3.fly()
 }
 
 

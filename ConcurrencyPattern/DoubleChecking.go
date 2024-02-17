@@ -1,39 +1,65 @@
-import threading
-import sys
+package main
 
-class Database(object):
-    def __init__(self):
-        print("database created")
-    
-    def add_data(self, data):
-        print(data)
+import (
+	"fmt"
+	"sync"
+)
 
-class Singleton(object):
-    _instance = None  # Keep instance reference 
-    db = None
-    _lock = threading.Lock()  # Add a lock for thread synchronization
-    
-    def __new__(cls):
-        if not cls._instance:
-            with cls._lock:  # Acquire the lock
-                if not cls._instance:
-                    cls._instance = super(Singleton, cls).__new__(cls)
-                    cls.db = Database()
-        return cls._instance
-    
-    def add_data(self, data):
-        self.db.add_data(data)
+// Database represents a dummy database
+type Database struct{}
 
-# Client code. 
-s1 = Singleton() 
-s2 = Singleton()
-print(s1)
-print(s2)
-s2.add_data("Hello, world!")
+// NewDatabase creates a new Database instance
+func NewDatabase() *Database {
+	fmt.Println("Database created")
+	return &Database{}
+}
 
-"""
-database created
-<__main__.Singleton object at 0x000002260C56BCD0>
-<__main__.Singleton object at 0x000002260C56BCD0>
+// AddData adds data to the database
+func (d *Database) AddData(data string) {
+	fmt.Println(data)
+}
+
+// Singleton represents a singleton object
+type Singleton struct {
+	db *Database
+}
+
+var (
+	instance *Singleton
+	once     sync.Once
+	mu       sync.Mutex // Mutex for synchronization
+)
+
+// GetInstance returns the singleton instance
+func GetInstance() *Singleton {
+	if instance == nil { // Check without acquiring lock to improve performance
+		mu.Lock()
+		defer mu.Unlock()
+		if instance == nil {
+			instance = &Singleton{db: NewDatabase()}
+		}
+	}
+	return instance
+}
+
+// AddData adds data to the database via the singleton instance
+func (s *Singleton) AddData(data string) {
+	s.db.AddData(data)
+}
+
+func main() {
+	s1 := GetInstance()
+	s2 := GetInstance()
+
+	fmt.Println(s1)
+	fmt.Println(s2)
+
+	s2.AddData("Hello, world!")
+}
+
+/*
+Database created
+&{0x5500b8}
+&{0x5500b8}
 Hello, world!
-"""
+*/

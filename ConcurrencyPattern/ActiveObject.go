@@ -7,77 +7,80 @@ import (
 
 // MethodRequest encapsulates a method call along with its arguments
 type MethodRequest struct {
-	method func(args ...interface{})
-	args   []interface{}
+	method func()
+}
+
+// Execute runs the method
+func (m *MethodRequest) Execute() {
+	m.method()
 }
 
 // ActiveObject encapsulates its own thread of control and executes methods asynchronously
 type ActiveObject struct {
-	queue      chan MethodRequest
-	stopSignal sync.WaitGroup
-	isRunning  bool
+	queue     chan *MethodRequest
+	isRunning bool
+	wg        sync.WaitGroup
 }
 
 // NewActiveObject creates a new ActiveObject
 func NewActiveObject() *ActiveObject {
 	return &ActiveObject{
-		queue:      make(chan MethodRequest),
-		isRunning:  true,
+		queue:     make(chan *MethodRequest),
+		isRunning: true,
 	}
 }
 
-// Run starts the ActiveObject's goroutine
-func (a *ActiveObject) Run() {
-	for a.isRunning || len(a.queue) > 0 {
-		methodRequest := <-a.queue
-		methodRequest.method(methodRequest.args...)
-		a.stopSignal.Done() // Decrement the WaitGroup counter
+// Run executes method requests
+func (ao *ActiveObject) Run() {
+	ao.wg.Add(1)
+	defer ao.wg.Done()
+	for ao.isRunning || len(ao.queue) > 0 {
+		select {
+		case methodRequest := <-ao.queue:
+			methodRequest.Execute()
+		}
 	}
 }
 
-// ScheduleMethod schedules a method to be executed
-func (a *ActiveObject) ScheduleMethod(method func(args ...interface{}), args ...interface{}) {
-	a.stopSignal.Add(1) // Increment the WaitGroup counter
-	methodRequest := MethodRequest{
-		method: method,
-		args:   args,
-	}
-	a.queue <- methodRequest
+// ScheduleMethod schedules a method request
+func (ao *ActiveObject) ScheduleMethod(method func()) {
+	ao.queue <- &MethodRequest{method: method}
 }
 
-// Stop stops the ActiveObject's goroutine
-func (a *ActiveObject) Stop() {
-	a.isRunning = false
-	go func() {
-		a.stopSignal.Wait() // Wait for the goroutine to finish
-		close(a.queue)
-	}()
+// StopThread stops the ActiveObject thread
+func (ao *ActiveObject) StopThread() {
+	ao.isRunning = false
+	close(ao.queue)
+}
+
+// Proxy acts as a wrapper around the ActiveObject and forwards method calls to it
+type Proxy struct {
+	activeObject *ActiveObject
+}
+
+// NewProxy creates a new Proxy
+func NewProxy(activeObject *ActiveObject) *Proxy {
+	return &Proxy{activeObject: activeObject}
+}
+
+// InvokeMethod invokes a method request
+func (p *Proxy) InvokeMethod(method func()) {
+	p.activeObject.ScheduleMethod(method)
 }
 
 func main() {
-	// Create an instance of ActiveObject
+	// Create an instance of ActiveObject and Proxy
 	activeObject := NewActiveObject()
+	proxy := NewProxy(activeObject)
 
-    var wg sync.WaitGroup
-	wg.Add(1)
+	// Start the ActiveObject thread
+	go activeObject.Run()
 
-	// Start the ActiveObject goroutine
-	go func() {
-		activeObject.Run()
-		wg.Done()
-	}()
+	// Invoke methods on the Proxy
+	proxy.InvokeMethod(func() { fmt.Println("Hello") })
+	proxy.InvokeMethod(func() { fmt.Println("World") })
 
-	// Invoke methods on the ActiveObject
-	activeObject.ScheduleMethod(printMessage, "Hello")
-	activeObject.ScheduleMethod(printMessage, "World")
-
-	// Stop the ActiveObject goroutine
-	activeObject.Stop()
-    wg.Wait()
-
-}
-
-func printMessage(args ...interface{}) {
-	message := args[0].(string)
-	fmt.Println(message)
+	// Wait for the ActiveObject thread to complete
+	activeObject.StopThread()
+	activeObject.wg.Wait()
 }

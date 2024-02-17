@@ -2,55 +2,61 @@ package main
 
 import "fmt"
 
-// Student struct
-type Student struct {
-	name string
+// Shape interface
+type Shape interface {
+	Draw()
 }
 
-// NewStudent constructor
-func NewStudent(name string) *Student {
-	return &Student{name: name}
+// Circle struct
+type Circle struct {
+	x, y, radius int
 }
 
-// String method for Student
-func (s *Student) String() string {
-	return fmt.Sprintf("Student: %s", s.name)
+// NewCircle constructor
+func NewCircle(x, y, r int) *Circle {
+	return &Circle{x: x, y: y, radius: r}
 }
 
-// Class struct
-type Class struct {
-	className string
-	students  []*Student
+// Draw method for Circle
+func (c *Circle) Draw() {
+	fmt.Println("Draw the Circle.")
 }
 
-// NewClass constructor
-func NewClass(className string) *Class {
-	return &Class{className: className, students: []*Student{}}
+// Rectangle struct
+type Rectangle struct {
+	x, y, length, width int
 }
 
-// AddStudent method for Class
-func (c *Class) AddStudent(st *Student) {
-	c.students = append(c.students, st)
+// NewRectangle constructor
+func NewRectangle(x, y, l, w int) *Rectangle {
+	return &Rectangle{x: x, y: y, length: l, width: w}
 }
 
-// Display method for Class
-func (c *Class) Display() {
-	for _, student := range c.students {
-		fmt.Println(student)
-	}
+// OldDraw method for Rectangle
+func (r *Rectangle) OldDraw() {
+	fmt.Println("Drawing Rectangle.")
 }
 
-// Client Code
+// RectangleAdapter struct
+type RectangleAdapter struct {
+	adaptee *Rectangle
+}
+
+// NewRectangleAdapter constructor
+func NewRectangleAdapter(x, y, l, w int) *RectangleAdapter {
+	return &RectangleAdapter{adaptee: NewRectangle(x, y, l, w)}
+}
+
+// Draw method for RectangleAdapter
+func (ra *RectangleAdapter) Draw() {
+	ra.adaptee.OldDraw()
+}
+
 func main() {
-	c := NewClass("SS1")
-	s1 := NewStudent("John Smith")
-	s2 := NewStudent("Jane Smith")
-	c.AddStudent(s1)
-	c.AddStudent(s2)
-	c.Display()
+	adapter := NewRectangleAdapter(1, 2, 3, 4)
+	adapter.Draw()
 }
 
-/*
-Student: John Smith
-Student: Jane Smith
+/* 
+Drawing Rectangle.
 */

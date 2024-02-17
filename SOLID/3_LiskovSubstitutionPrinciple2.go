@@ -87,8 +87,6 @@ The sparrow is fluttering its wings.
 Bird is flying at a positive height.
 The penguin cannot fly.
 Error: fly() method called; flight height is still zero.
-The penguin is sliding on its belly!
-The penguin is swimming in the water!
 The dodo is extinct and cannot fly.
 Error: fly() method called; flight height is still zero.
 */

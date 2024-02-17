@@ -54,6 +54,20 @@ func (s *Sparrow) fly() {
 	fmt.Println("The sparrow is fluttering its wings!")
 }
 
+
+
+type Pigeon struct {
+	Bird
+}
+
+func (s *Pigeon) fly() {
+	fmt.Println("The pigeon is fluttering its wings!")
+}
+
+func (s *Pigeon) makeCooingSound() {
+	fmt.Println("The pigeon is making a cooing sound.")
+}
+
 // Client code.
 func main() {
 	bird1 := &Eagle{Bird{Animal{"Eagle"}}}
@@ -62,21 +76,12 @@ func main() {
 	bird2 := &Dodo{Bird{Animal{"Dodo"}}}
 	bird2.fly()
 
-	/*
-		The eagle is soaring through the sky!
-		The dodo is extinct and cannot fly.
-	*/
-
-	bird3 := &Penguin{Bird{Animal{"Pigeon"}}}
+	bird3 := &Pigeon{Bird{Animal{"Pigeon"}}}
 	bird3.fly()
-
-	/*
-		The pigeon is fluttering its wings!
-	*/
 }
 
 /*
 The eagle is soaring through the sky!
 The dodo is extinct and cannot fly.
-The penguin cannot fly.
+The pigeon is fluttering its wings!
 */

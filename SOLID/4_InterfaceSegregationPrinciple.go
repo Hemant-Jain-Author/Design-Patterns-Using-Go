@@ -25,11 +25,6 @@ func (bip BasicInkjetPrinter) Print(document string) {
 	fmt.Printf("Printing %s using basic inkjet printer\n", document)
 }
 
-// Scan method for BasicInkjetPrinter
-func (bip BasicInkjetPrinter) Scan() {
-	fmt.Println("Scanning using basic inkjet printer")
-}
-
 // HighEndOfficePrinter struct
 type HighEndOfficePrinter struct{}
 
@@ -52,7 +47,6 @@ func main() {
 	// Client code
 	basicPrinter := BasicInkjetPrinter{}
 	basicPrinter.Print("Sample Document")
-	basicPrinter.Scan()
 
 	officePrinter := HighEndOfficePrinter{}
 	officePrinter.Print("Important Report")
@@ -62,7 +56,6 @@ func main() {
 
 /*
 Printing Sample Document using basic inkjet printer
-Scanning using basic inkjet printer
 Printing Important Report using high end office printer
 Scanning using high end office printer
 Faxing Confidential Memo using high end office printer

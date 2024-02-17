@@ -3,66 +3,72 @@ package main
 import (
 	"fmt"
 	"sync"
+	"time"
 )
 
 // Barrier represents a synchronization barrier
 type Barrier struct {
-	count       int
-	barrierLock sync.Mutex
-	barrierCond *sync.Cond
+	count int
+	lock  sync.Mutex
+	cond  *sync.Cond
 }
 
-// NewBarrier creates a new Barrier
+// NewBarrier creates a new Barrier with the given count
 func NewBarrier(count int) *Barrier {
-	b := &Barrier{
-		count:       count,
-		barrierCond: sync.NewCond(&sync.Mutex{}),
-	}
+	b := &Barrier{count: count}
+	b.cond = sync.NewCond(&b.lock)
 	return b
 }
 
-// Wait waits for all goroutines to reach the barrier
+// Wait waits until all goroutines have called Wait on the barrier
 func (b *Barrier) Wait() {
-	b.barrierLock.Lock()
-	defer b.barrierLock.Unlock()
+	b.lock.Lock()
+	defer b.lock.Unlock()
 
 	b.count--
-
 	if b.count > 0 {
-		b.barrierCond.Wait()
+		b.cond.Wait()
 	} else {
-		b.barrierCond.Broadcast()
+		b.cond.Broadcast()
 	}
 }
 
-func worker(b *Barrier, id int) {
-	fmt.Printf("Worker %d started\n", id)
-	// Simulating some work
+// Worker represents a worker goroutine
+type Worker struct {
+	id      int
+	barrier *Barrier
+}
+
+// NewWorker creates a new Worker with the given id and barrier
+func NewWorker(id int, barrier *Barrier) *Worker {
+	return &Worker{id: id, barrier: barrier}
+}
+
+// Work simulates work for the worker
+func (w *Worker) Work() {
+	fmt.Printf("Worker %d started\n", w.id)
 	for i := 0; i < 3; i++ {
-		fmt.Printf("Worker %d working...\n", id)
-		// Simulating some computation
+		fmt.Printf("Worker %d working...\n", w.id)
+		time.Sleep(time.Second)
 	}
-	fmt.Printf("Worker %d finished\n", id)
-	b.Wait()
+	fmt.Printf("Worker %d finished\n", w.id)
+	w.barrier.Wait()
 }
 
 func main() {
-	// Create a barrier with the specified number of workers
 	numWorkers := 3
 	barrier := NewBarrier(numWorkers)
-
-	// Start worker goroutines
 	var wg sync.WaitGroup
+
 	for i := 0; i < numWorkers; i++ {
 		wg.Add(1)
-		go func(i int) {
+		worker := NewWorker(i, barrier)
+		go func() {
 			defer wg.Done()
-			worker(barrier, i)
-		}(i)
+			worker.Work()
+		}()
 	}
 
-	// Wait for all workers to finish
 	wg.Wait()
-
 	fmt.Println("All workers finished. Proceeding to the next step.")
 }
