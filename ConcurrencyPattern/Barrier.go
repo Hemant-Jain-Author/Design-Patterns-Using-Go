@@ -55,6 +55,7 @@ func (w *Worker) Work() {
 	w.barrier.Wait()
 }
 
+// Client Code
 func main() {
 	numWorkers := 3
 	barrier := NewBarrier(numWorkers)

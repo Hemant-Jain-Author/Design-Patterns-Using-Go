@@ -47,6 +47,7 @@ func (s *Singleton) AddData(data string) {
 	s.db.AddData(data)
 }
 
+// Client Code
 func main() {
 	s1 := GetInstance()
 	s2 := GetInstance()

@@ -69,6 +69,7 @@ func (sr *ShapeRegistry) Load() {
 	sr.AddShape("rectangle", &Rectangle{})
 }
 
+// Client code
 func main() {
 	shapeRegistry := NewShapeRegistry()
 	shapeRegistry.Load()

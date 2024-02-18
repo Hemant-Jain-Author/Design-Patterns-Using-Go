@@ -49,6 +49,7 @@ func (off *Off) toString() string {
 	return "Off"
 }
 
+// Client code
 func main() {
 	c := NewBulbControl()
 	c.flip()

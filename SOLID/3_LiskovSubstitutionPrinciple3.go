@@ -55,6 +55,7 @@ func TestRect(rect *Rectangle) {
     }
 }
 
+// Client code
 func main() {
 	r := NewRectangle(10, 20)
     r.SetHeight(10)

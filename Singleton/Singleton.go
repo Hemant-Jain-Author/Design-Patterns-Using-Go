@@ -27,6 +27,7 @@ func (db *Database) AddData(dt string) {
 	fmt.Println("Data added:", db.data)
 }
 
+// Client code
 func main() {
 	s1 := GetInstance()
 	s2 := GetInstance()

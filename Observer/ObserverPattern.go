@@ -65,6 +65,7 @@ func (o *ConcreteObserver) SetSubject(subject Subject) {
 	o.subject = subject
 }
 
+// Client code
 func main() {
 	subject := &ConcreteSubject{}
 	observer1 := &ConcreteObserver{}

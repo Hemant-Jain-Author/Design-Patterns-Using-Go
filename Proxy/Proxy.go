@@ -29,6 +29,7 @@ func (p *Proxy) Request() {
 	p.concSub.Request()
 }
 
+// Client code
 func main() {
 	proxy := NewProxy()
 	proxy.Request()

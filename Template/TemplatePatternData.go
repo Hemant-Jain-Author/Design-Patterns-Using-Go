@@ -52,8 +52,8 @@ func (a *AddDataToDB) close() {
 	fmt.Println("Close Database.")
 }
 
+// Client code
 func main() {
-	// Client Code
 	o := &AddDataToDB{}
 	o.addData()
 }

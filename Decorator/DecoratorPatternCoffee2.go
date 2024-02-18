@@ -55,6 +55,7 @@ type EspressoDecorator struct {
 	BaseCoffeeDecorator
 }
 
+// Client Code
 func main() {
 	component := &SimpleCoffee{}
 	decorator1 := &MilkDecorator{BaseCoffeeDecorator: BaseCoffeeDecorator{component, "Milk", 4}}

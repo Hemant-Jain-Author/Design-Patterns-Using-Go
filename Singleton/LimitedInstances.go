@@ -20,6 +20,7 @@ func NewLimitedInstances() (*LimitedInstances, error) {
 	return &instance, nil
 }
 
+// Client code
 func main() {
 	for i := 0; i < 10; i++ {
 		instance, err := NewLimitedInstances()

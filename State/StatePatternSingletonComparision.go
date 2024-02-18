@@ -118,6 +118,7 @@ func test(state State, count int) {
 	fmt.Println(delta.Seconds())
 }
 
+// Client code
 func main() {
 	state1 := &ConcreteState1{}
 	test(state1, 10)

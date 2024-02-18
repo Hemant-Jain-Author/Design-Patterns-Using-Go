@@ -68,6 +68,7 @@ func (f ConcreteFactory2) CreateProductB() ProductB {
 	return ProductB2{}
 }
 
+// Client Code
 func main() {
 	factory1 := ConcreteFactory1{}
 	productA1 := factory1.CreateProductA()

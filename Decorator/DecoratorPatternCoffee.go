@@ -71,6 +71,7 @@ func (d *EspressoDecorator) GetIngredients() string {
 	return d.component.GetIngredients() + ", Espresso"
 }
 
+// Client Code
 func main() {
 	component := &SimpleCoffee{}
 	decorator1 := &MilkDecorator{BaseCoffeeDecorator{component}}

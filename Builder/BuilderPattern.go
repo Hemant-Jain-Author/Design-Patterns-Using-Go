@@ -74,6 +74,7 @@ func (d *Director) construct3() *Product {
 	return d.builder.setPartA("A3").getProduct()
 }
 
+// Client Code
 func main() {
 	builder := NewConcreteBuilder()
 	director := NewDirector(builder)

@@ -61,6 +61,7 @@ func (sc *StrategyClass) sort(a []int) {
 	sc.sorter.sort(a)
 }
 
+// Client code
 func main() {
 	a := []int{4, 5, 3, 2, 6, 7, 1, 8, 9, 10}
 	s := NewStrategyClass(&BubbleSort{})

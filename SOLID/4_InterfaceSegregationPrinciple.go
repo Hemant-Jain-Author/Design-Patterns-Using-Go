@@ -43,8 +43,8 @@ func (heop HighEndOfficePrinter) Fax(document string) {
 	fmt.Printf("Faxing %s using high end office printer\n", document)
 }
 
+// Client code
 func main() {
-	// Client code
 	basicPrinter := BasicInkjetPrinter{}
 	basicPrinter.Print("Sample Document")
 

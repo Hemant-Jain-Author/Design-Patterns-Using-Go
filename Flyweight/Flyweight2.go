@@ -52,8 +52,8 @@ func (cc *ClientClass) Operation() {
 	cc.flyweight.Operation(cc.extrinsicState)
 }
 
+// Client Code
 func main() {
-	// Client code
 	factory := NewFlyweightFactory()
 	c := NewClientClass(factory, "common", "separate1")
 	c.Operation()

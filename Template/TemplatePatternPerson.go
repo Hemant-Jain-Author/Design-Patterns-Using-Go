@@ -137,8 +137,8 @@ func (s *SuperHero) sleep() {
 	fmt.Println("Sleep")
 }
 
+// Client code
 func main() {
-	// Client Code
 	d := &Doctor{}
 	d.dailyRoutine()
 	fmt.Println()

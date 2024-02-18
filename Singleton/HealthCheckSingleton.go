@@ -23,6 +23,7 @@ func (hc *HealthCheck) changeServer() {
 	hc.servers = append(hc.servers[:len(hc.servers)-1], "Server 5")
 }
 
+// Client code
 func main() {
 	hc1 := NewHealthCheck()
 	hc1.addServer()

@@ -37,6 +37,7 @@ func (c *Context) execute() {
 	c.strategy.execute(data)
 }
 
+// Client code
 func main() {
 	c := NewContext(&ConcreteStrategy1{})
 	c.execute()

@@ -69,6 +69,7 @@ func (m *MacAPI) DrawCircle() {
 	fmt.Println("Drawing a circle on Mac.")
 }
 
+// Client Code
 func main() {
 	windowsAPI := &WindowsAPI{}
 	macAPI := &MacAPI{}

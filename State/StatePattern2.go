@@ -38,6 +38,7 @@ func (cs2 *ConcreteState2) handle(context *Context) {
 	context.changeState(&ConcreteState1{})
 }
 
+// Client code
 func main() {
 	state1 := &ConcreteState1{}
 	context := NewContext(state1)

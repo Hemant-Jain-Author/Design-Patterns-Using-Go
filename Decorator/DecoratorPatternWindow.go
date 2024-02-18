@@ -47,6 +47,7 @@ func (d *HorizontalScrollBarDecorator) Draw() {
 	fmt.Println("HorizontalScrollBarDecorator draw.")
 }
 
+// Client Code
 func main() {
 	component := &SimpleWindow{}
 	decorator1 := &VerticalScrollBarDecorator{BaseDecorator{component}}

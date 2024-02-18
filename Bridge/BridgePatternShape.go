@@ -66,6 +66,7 @@ func (b *Blue) Fill() string {
 	return "Blue"
 }
 
+// Client Code
 func main() {
 	c1 := &Red{}
 	circle := NewCircle(c1)

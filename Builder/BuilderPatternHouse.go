@@ -88,8 +88,8 @@ func (hd *HouseDirector) construct() *House {
 	return hd.builder.setWall().setRoof().getHouse()
 }
 
+// Client Code
 func main() {
-	// Client code.
 	builder := &ConcreteHouseBuilder{house: &House{}}
 	director := NewHouseDirector(builder)
 

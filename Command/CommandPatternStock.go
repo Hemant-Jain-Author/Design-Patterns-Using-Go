@@ -62,8 +62,8 @@ func (r *ReceiverStockTrade) sell() {
 	fmt.Println("Sell stocks")
 }
 
+// Client Code
 func main() {
-	// Client code.
 	trader := &ReceiverStockTrade{}
 	buyStock := NewBuyStockOrder(trader)
 	sellStock := NewSellStockOrder(trader)

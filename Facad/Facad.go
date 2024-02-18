@@ -50,8 +50,8 @@ func (f *SystemManagerFacade) Operation() {
 	f.subsystem2.Operation2()
 }
 
+// Client Code
 func main() {
-	// Client code
 	facade := NewSystemManagerFacade()
 	facade.Operation()
 }

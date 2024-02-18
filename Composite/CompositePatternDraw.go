@@ -96,8 +96,8 @@ func (cs *CompoundShape) draw() string {
 	return st
 }
 
+// Client Code
 func main() {
-	// Client code.
 	all := NewCompoundShape()
 	all.add(NewRectangle(1, 2, 1, 2))
 	all.add(NewCircle(5, 3, 10))

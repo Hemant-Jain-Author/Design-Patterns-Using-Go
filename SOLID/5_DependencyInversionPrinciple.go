@@ -26,8 +26,8 @@ func (e EmailSender) SendEmail(toAddress, fromAddress, subject, body string) {
 	e.MailSender.SendMail(toAddress, fromAddress, subject, body)
 }
 
+// Client code
 func main() {
-	// Client code.
 	// Create an instance of the SmtpServer class
 	smtpServer := SmtpServer{}
 

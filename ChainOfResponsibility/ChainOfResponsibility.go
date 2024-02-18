@@ -47,8 +47,8 @@ func (ch2 *ConcreteHandler2) handleRequest() {
 	}
 }
 
+// Client Code
 func main() {
-	// Client code.
 	ch1 := NewConcreteHandler1(nil)
 	ch2 := NewConcreteHandler2(ch1)
 	ch2.handleRequest()

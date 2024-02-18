@@ -46,6 +46,7 @@ func (b *Bird) layEggs() {
     fmt.Printf("%s is laying eggs.\n", b.name)
 }
 
+// Client code
 func main() {
     animal1 := Mammal{Animal{"Cat"}}
     animal1.giveBirth()

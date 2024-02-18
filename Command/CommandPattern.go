@@ -62,8 +62,8 @@ func (r *Receiver) action(action string) {
 	fmt.Println(action)
 }
 
+// Client Code
 func main() {
-	// Client code.
 	receiver := &Receiver{}
 	concreteCommand := NewConcreteCommand(*receiver)
 	invoker := &Invoker{}

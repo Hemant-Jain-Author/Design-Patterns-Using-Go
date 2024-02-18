@@ -68,6 +68,7 @@ func Test(bird *Bird) {
     }
 }
 
+// Client code
 func main() {
     sparrow := NewSparrow("Sparrow")
     sparrow.Fly()

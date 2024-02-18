@@ -82,6 +82,7 @@ func (c *CareTaker) Redo() *Memento {
 	return c.GetMemento(c.top)
 }
 
+// Client code
 func main() {
 	originator := &Originator{}
 	careTaker := NewCareTaker()

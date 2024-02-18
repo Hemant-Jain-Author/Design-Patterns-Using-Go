@@ -43,8 +43,8 @@ func (ff *FlyweightFactory) GetCount() int {
 	return len(ff.flyweights)
 }
 
+// Client Code
 func main() {
-	// Client code
 	factory := NewFlyweightFactory()
 	flyweight1 := factory.GetFlyweight("key")
 	flyweight2 := factory.GetFlyweight("key")

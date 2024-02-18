@@ -52,6 +52,7 @@ func (ra *RectangleAdapter) Draw() {
 	ra.adaptee.OldDraw()
 }
 
+// Client Code
 func main() {
 	adapter := NewRectangleAdapter(1, 2, 3, 4)
 	adapter.Draw()

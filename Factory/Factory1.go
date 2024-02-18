@@ -40,12 +40,10 @@ func (cf2 *ConcreteFactory2) CreateProduct() Product {
 
 // Client code
 func main() {
-	// ConcreteFactory1
 	f1 := &ConcreteFactory1{}
 	p1 := f1.CreateProduct()
 	p1.Operation()
 
-	// ConcreteFactory2
 	f2 := &ConcreteFactory2{}
 	p2 := f2.CreateProduct()
 	p2.Operation()

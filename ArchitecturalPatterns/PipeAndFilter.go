@@ -66,6 +66,7 @@ func (d *DataProcessingPipeline) ProcessData(data string) string {
 	return data
 }
 
+// Client Code
 func main() {
 	pipeline := NewDataProcessingPipeline()
 	pipeline.AddFilter(&CapitalizeFilter{})

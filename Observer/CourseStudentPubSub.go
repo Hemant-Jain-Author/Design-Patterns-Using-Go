@@ -50,6 +50,7 @@ func (s *Student) Notify(subject, message string) {
 	fmt.Printf("%s received message on subject '%s': %s\n", s.Name, subject, message)
 }
 
+// Client code
 func main() {
 	courses := NewCourses()
 	john := NewStudent("John")

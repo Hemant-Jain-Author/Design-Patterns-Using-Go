@@ -41,6 +41,7 @@ func (lbp *LazyBookParserProxy) NumPages() int {
 	return lbp.subject.NumPages()
 }
 
+// Client code
 func main() {
 	proxy := &LazyBookParserProxy{book: "LOTR"}
 	fmt.Println(proxy.NumPages())

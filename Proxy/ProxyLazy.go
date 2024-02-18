@@ -26,6 +26,7 @@ func (p *Proxy) Request() {
 	p.subject.Request()
 }
 
+// Client code
 func main() {
 	proxy := &Proxy{}
 	proxy.Request()

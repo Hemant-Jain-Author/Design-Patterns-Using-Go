@@ -68,6 +68,7 @@ func (mf MacFactory) GetButton() Button {
     return MacButton{}
 }
 
+// Client Code
 func main() {
     m := MacFactory{}
     m.GetMenu().Desc()

@@ -67,8 +67,8 @@ func (d *Director) construct2() *Product {
 	return d.builder.getProduct()
 }
 
+// Client Code
 func main() {
-	// Client code.
 	builder := &ConcreteBuilder{}
 	director := NewDirector(builder)
 

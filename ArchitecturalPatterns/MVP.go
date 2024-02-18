@@ -73,6 +73,7 @@ func (p *Presenter) OnButtonClick() {
 	p.view.DisplayData(data)
 }
 
+// Client Code
 func main() {
 	model := NewModel()
 	view := &View{}

@@ -13,7 +13,6 @@ func (m *Memento) GetState() map[string]interface{} {
 	return m.state
 }
 
-
 // Originator struct
 type Originator struct {
 	state map[string]interface{}
@@ -85,6 +84,7 @@ func (c *CareTaker) Redo() *Memento {
 	return c.GetMemento(c.top)
 }
 
+// Client code
 func main() {
 	originator := &Originator{}
 	careTaker := NewCareTaker()

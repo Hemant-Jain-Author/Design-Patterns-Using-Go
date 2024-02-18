@@ -61,6 +61,7 @@ func (li *LinkedListIterator) Next() int {
 	return val
 }
 
+// Client code
 func main() {
 	aggregate := &LinkedList{}
 	for i := 0; i < 5; i++ {

@@ -42,6 +42,7 @@ func (c *Context) getVariable(variable string) int {
 	return c.variables[variable]
 }
 
+// Client code
 func main() {
 	context := &Context{}
 	context.setVariable("x", 10)

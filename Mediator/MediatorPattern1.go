@@ -69,6 +69,7 @@ func (c *ConcreteColleague2) receive(message string) {
 	fmt.Printf("%s Received Message %s\n", c.id, message)
 }
 
+// Client code
 func main() {
 	mediator := &ConcreteMediator{
 		colleagues: make(map[string]Colleague),

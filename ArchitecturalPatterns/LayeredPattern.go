@@ -71,6 +71,7 @@ func (pl *PresentationLayer) AddProduct(product string) {
 	pl.businessLogic.AddProduct(product)
 }
 
+// Client Code
 func main() {
 	dataAccess := NewDataAccessLayer()
 	businessLogic := NewBusinessLogicLayer(dataAccess)

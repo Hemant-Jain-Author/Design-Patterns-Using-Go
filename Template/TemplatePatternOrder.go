@@ -52,8 +52,8 @@ func (s *StoreOrderPacking) delivery() {
 	fmt.Println("Add thanks message to the box and deliver to the customer.")
 }
 
+// Client code
 func main() {
-	// Client Code
 	o := &OnlineOrderPacking{}
 	o.packProduct()
 	fmt.Println()

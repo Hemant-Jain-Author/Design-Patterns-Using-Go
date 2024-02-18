@@ -89,6 +89,7 @@ func ParseExpression(expression string, context *Context) Expression {
 	}
 }
 
+// Client code
 func main() {
 	context := NewContext()
 	context.SetValue("x", 10)

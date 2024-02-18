@@ -117,9 +117,8 @@ func TestRect(rect *Rectangle) {
 	}
 }
 
+// Client code
 func main() {
-
-
 	dog := NewDog("Buddy")
 	cat := NewCat("Kitty")
 

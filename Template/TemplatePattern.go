@@ -41,8 +41,8 @@ func (c *ConcreteClass2) operation2() {
 	fmt.Println("Concrete Class 2 : Operation 2")
 }
 
+// Client code
 func main() {
-	// Client Code
 	concreteClass := &ConcreteClass1{}
 	concreteClass.templateMethod()
 }

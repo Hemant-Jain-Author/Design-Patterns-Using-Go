@@ -61,6 +61,7 @@ func (ci *ConcreteIterator) HasNext() bool {
 	return ci.index < len(ci.aggregate.data)
 }
 
+// Client code
 func main() {
 	aggregate := NewConcreteAggregate()
 

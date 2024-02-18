@@ -40,12 +40,10 @@ func (cf *CatFactory) CreateAnimal() Animal {
 
 // Client code
 func main() {
-	// Dog
 	dogFactory := &DogFactory{}
 	dog := dogFactory.CreateAnimal()
 	dog.Speak()
 
-	// Cat
 	catFactory := &CatFactory{}
 	cat := catFactory.CreateAnimal()
 	cat.Speak()

@@ -61,6 +61,7 @@ func (dp *DataProcessor) formatOutput() {
 	// Output formatting logic
 }
 
+// Client Code
 func main() {
 	data := "exampleData"
 	processor := NewDataProcessor(data)

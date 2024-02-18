@@ -73,6 +73,7 @@ func (vm *ViewModel) GetData() string {
 	return vm.model.GetData()
 }
 
+// Client Code
 func main() {
 	model := &Model{data: "Default."}
 	viewModel := NewViewModel(model)

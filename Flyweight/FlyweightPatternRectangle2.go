@@ -63,6 +63,7 @@ func (r *Rectangle) Draw() {
 	fmt.Printf("Draw rectangle color:%s topleft: (%d,%d) rightBottom: (%d,%d)\n", r.color, r.x1, r.y1, r.x2, r.y2)
 }
 
+// Client code
 func main() {
 	rand.Seed(time.Now().UnixNano())
 

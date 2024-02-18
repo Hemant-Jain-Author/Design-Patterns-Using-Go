@@ -50,8 +50,8 @@ func (l *Leaf) operation() {
 	fmt.Println("Leaf Operation")
 }
 
+// Client Code
 func main() {
-	// Client code.
 	composite := NewComposite()
 	composite.add(&Leaf{})
 	composite2 := NewComposite()

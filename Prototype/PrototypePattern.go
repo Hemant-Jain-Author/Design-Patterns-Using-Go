@@ -60,6 +60,7 @@ func (pr *PrototypeRegistry) Load() {
 	pr.AddPrototype("CP2", &ConcretePrototype2{})
 }
 
+// Client code
 func main() {
 	prototypeRegistry := NewPrototypeRegistry()
 	prototypeRegistry.Load()

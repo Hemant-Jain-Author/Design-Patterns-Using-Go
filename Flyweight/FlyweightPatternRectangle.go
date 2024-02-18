@@ -48,8 +48,8 @@ func (rf *RectangleFactory) GetCount() int {
 	return len(rf.shapes)
 }
 
+// Client Code
 func main() {
-	// Client code
 	factory := NewRectangleFactory()
 	for i := 0; i < 1000; i++ {
 		colour := fmt.Sprintf("%d", rand.Intn(1000))

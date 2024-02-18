@@ -35,8 +35,8 @@ func (ahc *ATMHandlerConcrete) handleRequest(amount int) {
 	}
 }
 
+// Client Code
 func main() {
-	// Client code.
 	ch := NewATMHandlerConcrete(
 		NewATMHandlerConcrete(
 			NewATMHandlerConcrete(

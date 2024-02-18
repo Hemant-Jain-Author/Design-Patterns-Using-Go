@@ -66,6 +66,7 @@ func (s *ConcreteSubscriber) GetID() string {
 	return s.id
 }
 
+// Client code
 func main() {
 	pub := &ConcretePublisher{}
 

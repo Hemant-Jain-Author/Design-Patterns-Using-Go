@@ -105,6 +105,7 @@ func (c *Controller) HandleUserInput(userInput string) {
 	c.model.SetData(userInput)
 }
 
+// Client Code
 func main() {
 	model := NewModel()
 	controller := NewController(model)

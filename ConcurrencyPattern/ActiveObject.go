@@ -68,6 +68,7 @@ func (p *Proxy) InvokeMethod(method func()) {
 	p.activeObject.ScheduleMethod(method)
 }
 
+// Client Code
 func main() {
 	// Create an instance of ActiveObject and Proxy
 	activeObject := NewActiveObject()

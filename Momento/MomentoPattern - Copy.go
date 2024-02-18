@@ -13,7 +13,6 @@ func (m *Memento) GetState() string {
 	return m.state
 }
 
-
 // Originator struct
 type Originator struct {
 	state     string
@@ -101,6 +100,7 @@ func (c *CareTaker) Redo() *Memento {
 	return c.GetMemento(c.top)
 }
 
+// Client code
 func main() {
 	originator := NewOriginator()
 	originator.SetState("State 1")

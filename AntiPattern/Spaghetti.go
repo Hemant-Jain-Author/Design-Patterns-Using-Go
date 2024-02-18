@@ -35,6 +35,7 @@ func processData(data string) (*sql.Rows, error) {
 	return rows, nil
 }
 
+// Client Code
 func main() {
 	data := "exampleData"
 	results, err := processData(data)

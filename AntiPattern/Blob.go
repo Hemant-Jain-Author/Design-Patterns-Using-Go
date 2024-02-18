@@ -50,6 +50,7 @@ func (b *Blob) PurgeData() {
 	// Purge data
 }
 
+// Client Code
 func main() {
 	// Create an instance of Blob
 	blob := NewBlob("example data")

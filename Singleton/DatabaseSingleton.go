@@ -67,6 +67,7 @@ func (db *Database) display() {
 	}
 }
 
+// Client code
 func main() {
 	db1 := NewDatabase()
 	db2 := NewDatabase()

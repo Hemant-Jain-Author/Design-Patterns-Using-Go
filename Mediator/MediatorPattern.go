@@ -71,6 +71,7 @@ func (p *Participant) Receive(message string) {
 	fmt.Printf("%s received Message: %s\n", p.name, message)
 }
 
+// Client code
 func main() {
 	chatRoom := &ChatRoom{participants: make(map[string]*Participant)}
 	James := NewParticipant("James", chatRoom)

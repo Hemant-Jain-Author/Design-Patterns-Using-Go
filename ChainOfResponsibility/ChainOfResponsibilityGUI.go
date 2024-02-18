@@ -94,8 +94,8 @@ func (p *Panel) setHelperText(text string) {
 	p.helpText = text
 }
 
+// Client Code
 func main() {
-	// Client code.
 	p := NewPanel(nil)
 	p.setHelperText("Panel help text.")
 
