@@ -59,6 +59,13 @@ func main() {
 	component := &ConcreteComponent{}
 	decorator1 := &ConcreteDecorator1{BaseDecorator{component}}
 	decorator2 := &ConcreteDecorator2{BaseDecorator{decorator1}}
-
 	decorator2.Operation()
 }
+
+/*
+ConcreteDecorator2 operation start.
+ConcreteDecorator1 operation start.
+ConcreteComponent operation.
+ConcreteDecorator1 operation end.
+ConcreteDecorator2 operation end.
+*/

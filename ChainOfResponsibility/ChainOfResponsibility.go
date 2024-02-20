@@ -2,59 +2,77 @@ package main
 
 import "fmt"
 
-// Handler interface
+// Handler defines the interface for handling requests
 type Handler interface {
-	handleRequest()
+	HandleRequest(request string)
+	SetSuccessor(successor Handler)
 }
 
-// ConcreteHandler1 struct
+// BaseHandler implements the basic handler structure
+type BaseHandler struct {
+	successor Handler
+}
+
+// SetSuccessor sets the successor handler
+func (h *BaseHandler) SetSuccessor(successor Handler) {
+	h.successor = successor
+}
+
+// ConcreteHandler1 handles request1
 type ConcreteHandler1 struct {
-	successor Handler
+	*BaseHandler
 }
 
-// NewConcreteHandler1 constructor
-func NewConcreteHandler1(successor Handler) *ConcreteHandler1 {
-	return &ConcreteHandler1{successor: successor}
-}
-
-// handleRequest method for ConcreteHandler1
-func (ch1 *ConcreteHandler1) handleRequest() {
-	if true { // Can handle request.
-		fmt.Println("Finally handled by ConcreteHandler1")
+// HandleRequest handles the request
+func (ch1 *ConcreteHandler1) HandleRequest(request string) {
+	if request == "request1" {
+		fmt.Println("ConcreteHandler1 handles the request1.")
 	} else if ch1.successor != nil {
-		fmt.Println("Message passed to next in chain by ConcreteHandler1")
-		ch1.successor.handleRequest()
+		ch1.successor.HandleRequest(request)
 	}
 }
 
-// ConcreteHandler2 struct
+// ConcreteHandler2 handles request2
 type ConcreteHandler2 struct {
-	successor Handler
+	*BaseHandler
 }
 
-// NewConcreteHandler2 constructor
-func NewConcreteHandler2(successor Handler) *ConcreteHandler2 {
-	return &ConcreteHandler2{successor: successor}
-}
-
-// handleRequest method for ConcreteHandler2
-func (ch2 *ConcreteHandler2) handleRequest() {
-	if false { // Can't handle request.
-		fmt.Println("Finally handled by ConcreteHandler2")
+// HandleRequest handles the request
+func (ch2 *ConcreteHandler2) HandleRequest(request string) {
+	if request == "request2" {
+		fmt.Println("ConcreteHandler2 handles the request2.")
 	} else if ch2.successor != nil {
-		fmt.Println("Message passed to next in chain by ConcreteHandler2")
-		ch2.successor.handleRequest()
+		ch2.successor.HandleRequest(request)
 	}
 }
 
-// Client Code
+// ConcreteHandler3 handles request3
+type ConcreteHandler3 struct {
+	*BaseHandler
+}
+
+// HandleRequest handles the request
+func (ch3 *ConcreteHandler3) HandleRequest(request string) {
+	if request == "request3" {
+		fmt.Println("ConcreteHandler3 handles the request3.")
+	} else if ch3.successor != nil {
+		ch3.successor.HandleRequest(request)
+	}
+}
+
 func main() {
-	ch1 := NewConcreteHandler1(nil)
-	ch2 := NewConcreteHandler2(ch1)
-	ch2.handleRequest()
+	ch1 := &ConcreteHandler1{&BaseHandler{nil}}
+	ch2 := &ConcreteHandler2{&BaseHandler{ch1}}
+	ch3 := &ConcreteHandler3{&BaseHandler{ch2}}
+
+	ch3.HandleRequest("request1")
+	ch3.HandleRequest("request2")
+	ch3.HandleRequest("request3")
+	ch3.HandleRequest("request4")
 }
 
 /*
-Message passed to next in chain by ConcreteHandler2
-Finally handled by ConcreteHandler1
+ConcreteHandler1 handles the request1.
+ConcreteHandler2 handles the request2.
+ConcreteHandler3 handles the request3.
 */

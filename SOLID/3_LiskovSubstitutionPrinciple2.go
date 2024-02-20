@@ -2,11 +2,7 @@ package main
 
 import "fmt"
 
-type Animal interface {
-}
-
 type Bird struct {
-    Animal
     name         string
     flightHeight int
 }

@@ -2,9 +2,6 @@ package main
 
 import "fmt"
 
-// SwissArmy struct
-type SwissArmy struct{}
-
 // DataProcessor struct
 type DataProcessor struct {
 	data string

@@ -54,3 +54,9 @@ func main() {
 	decorator2 := &HorizontalScrollBarDecorator{BaseDecorator{decorator1}}
 	decorator2.Draw()
 }
+
+/*
+SimpleWindow draw.
+VerticalScrollBarDecorator draw.
+HorizontalScrollBarDecorator draw.
+*/
